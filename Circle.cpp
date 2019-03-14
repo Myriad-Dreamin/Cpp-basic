@@ -23,7 +23,7 @@ class Point
 private:
 
     double lfx, lfy;
-	
+
 	friend std::ostream &operator<< (std::ostream& ous, Point const &right_Point);
     friend std::istream &operator>> (std::istream& ins, Point &left_Point);
 
@@ -144,9 +144,9 @@ int main ()
 
 	cir1->initfs ();
 	cir2->initfs ();
-    
+
     std::cout << (cir1->intersect(*cir2) ? "Intersect" : "Not intersect")<< std::endl;
-    
+
     delete cir1;
     delete cir2;
 

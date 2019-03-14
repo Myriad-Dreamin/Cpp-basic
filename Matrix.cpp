@@ -1,6 +1,7 @@
 #include <iostream>
 #include <algorithm>
 #include <string>
+
 class MatrixCalculateError
 {
 public:
@@ -67,17 +68,18 @@ inline std::ostream &operator<< (std::ostream &out_s, Matrix const &out_mat)
 
 void initMatrix (Matrix &mat, int const size_row, int const size_col)
 {
-    mat.rmc = size_row * size_col;
-    try 
+    try
     {
+        mat.rmc = size_row * size_col;
         mat.aloc_array = new int[mat.rmc];
+        mat.row = size_row;
+        mat.col = size_col;
     }
     catch(...)
     {
         throw ;
     }
-    mat.row = size_row;
-    mat.col = size_col;
+    return ;
 }
 
 void inputMatrix (Matrix &mat)
@@ -109,14 +111,17 @@ void addMatrix (Matrix const &mat_left, Matrix const &mat_right, Matrix &mat_res
 {
     if((mat_left.row != mat_right.row) || (mat_left.col != mat_right.col))
     {
-        throw MatrixCalculateError("mat_left not equal to mat_right");
+        throw MatrixCalculateError("mat_left is not able to calculate with mat_right");
     }
 
     if((mat_res.row != mat_left.row) || (mat_res.col != mat_left.col))
     {
-        if(mat_res.aloc_array != nullptr)deleteMatrix(mat_res);
         try
         {
+            if(mat_res.aloc_array != nullptr)
+            {
+                deleteMatrix(mat_res);
+            }
             initMatrix(mat_res, mat_left.row, mat_left.col);
         }
         catch (std::bad_alloc &e)
@@ -124,7 +129,7 @@ void addMatrix (Matrix const &mat_left, Matrix const &mat_right, Matrix &mat_res
             throw e;
         }
     }
-    
+
     for (int i = 0; i < mat_res.rmc; i++)
     {
         mat_res.aloc_array[i] = mat_left.aloc_array[i] + mat_right.aloc_array[i];
@@ -135,14 +140,17 @@ void subMatrix (Matrix const &mat_left, Matrix const &mat_right, Matrix &mat_res
 {
     if((mat_left.row != mat_right.row) || (mat_left.col != mat_right.col))
     {
-        throw MatrixCalculateError("mat_left not equal to mat_right");
+        throw MatrixCalculateError("mat_left is not able to calculate with mat_right");
     }
 
     if((mat_res.row != mat_left.row) || (mat_res.col != mat_left.col))
     {
-        if(mat_res.aloc_array != nullptr)deleteMatrix(mat_res);
         try
         {
+            if(mat_res.aloc_array != nullptr)
+            {
+                deleteMatrix(mat_res);
+            }
             initMatrix(mat_res, mat_left.row, mat_left.col);
         }
         catch (...)
@@ -159,18 +167,20 @@ void subMatrix (Matrix const &mat_left, Matrix const &mat_right, Matrix &mat_res
 
 int main ()
 {
-    std::ios::sync_with_stdio (false);
     using std::cout;
     using std::endl;
+    std::ios::sync_with_stdio (false);
 
     Matrix A, B, C;
-    
+
     initMatrix(A, 4, 5);
     initMatrix(B, 4, 5);
 
+    cout << "Please input a Matrix <int> (4 * 5)" << endl;
     inputMatrix(A);
+    cout << "Please input a Matrix <int> (4 * 5)" << endl;
     inputMatrix(B);
-    
+
     try
     {
         addMatrix(A, B, C);
@@ -210,7 +220,6 @@ int main ()
 1 2 3 4 2
 1 2 2 2 2
 3 3 3 3 3
-
 5 4 3 2 1
 1 2 3 4 2
 3 1 2 4 5
@@ -220,7 +229,6 @@ int main ()
 1 2 3 4 2
 1 2 2 2 2
 3 3 3 3 3
-
 5 4 3 2
 1 2 3 4
 3 1 2 4
