@@ -1,74 +1,47 @@
 #include <iostream>
 #include <algorithm>
+#include <string>
 
-template <typename MatrixType>
-class Matrix
+class MatrixCalculateError
 {
-private:
+public:
+    MatrixCalculateError () {}
 
+    MatrixCalculateError(char* str)
+    {
+        msg = str;
+    }
+
+    MatrixCalculateError(MatrixCalculateError& const rhs)
+    {
+        this->msg = rhs.msg;
+    }
+
+    std::string msg;
+};
+
+struct Matrix
+{
     int row, col, rmc;
 
-    MatrixType *aloc_array;
+    int *aloc_array;
 
-    template <typename MtxType>
-    friend std::ostream &operator<< (std::ostream &os, Matrix <MtxType> const &out_mat);
-
-public:
-
-    Matrix (int const size_row, int const size_col)
+    Matrix()
     {
-        aloc_array = new int[size_row*size_col];
-        row = size_row;
-        col = size_col;
-        rmc = row * col;
-    }
-    
-    ~Matrix ()
-    {
-        delete[] aloc_array;
+        row = col = rmc = 0;
         aloc_array = nullptr;
     }
 
-    inline MatrixType *operator[] (int const sel_row) const
+    friend std::ostream &operator<< (std::ostream &os, Matrix const &out_mat);
+
+    //底层实现，默认不捕捉异常
+    inline int *operator[] (int const sel_row) const
     {
         return aloc_array + sel_row * col;
     }
-    
-    Matrix <MatrixType> *operator+ (Matrix <MatrixType> const &right_mat) const
-    {
-        Matrix <MatrixType> *res_mat = new Matrix <MatrixType>(row, col);
-        for (int i = 0; i < rmc; i++)
-        {
-            res_mat->aloc_array[i] = aloc_array[i] + right_mat.aloc_array[i];
-        }
-        return res_mat;
-    }
-
-    Matrix <MatrixType> *operator- (Matrix <MatrixType> const &right_mat) const
-    {
-        Matrix <MatrixType> *res_mat = new Matrix <MatrixType>(row, col);
-        for (int i = 0; i < rmc; i++)
-        {
-            res_mat->aloc_array[i] = aloc_array[i] - right_mat.aloc_array[i];
-        }
-        return res_mat;
-    }
-
-    //init from stream
-    void initfs ()
-    {
-        using std::cin;
-
-        for (int i = 0; i < rmc; i++)
-        {
-            cin >> aloc_array[i];
-        }
-        return ;
-    }
 };
 
-template <typename MatrixType>
-inline std::ostream &operator<< (std::ostream &out_s, Matrix <MatrixType> const &out_mat)
+inline std::ostream &operator<< (std::ostream &out_s, Matrix const &out_mat)
 {
     for (int i = 0; i < out_mat.row; i++)
     {
@@ -80,6 +53,65 @@ inline std::ostream &operator<< (std::ostream &out_s, Matrix <MatrixType> const 
         }
     }
     return out_s;
+}
+
+void initMatrix (Matrix *mat, int const size_row, int const size_col)
+{
+    mat->rmc = size_row * size_col;
+    mat->aloc_array = new int[mat->rmc];
+    mat->row = size_row;
+    mat->col = size_col;
+}
+
+void inputMatrix (Matrix *mat)
+{
+    using std::cin;
+
+    for (int i = 0; i < rmc; i++)
+    {
+        cin >> mat->aloc_array[i];
+    }
+    return ;
+}
+
+void *deleteMatrix (Matrix *mat)
+{
+    delete[] mat->aloc_array;
+    mat->aloc_array = nullptr;
+    mat->rmc = mat->row = mat->col = 0;
+}
+
+void addMatrix (Matrix const *mat_left, Matrix const *mat_right, Matrix *mat_res)
+{
+    if((mat_left->row != mat_right->row) || (mat_left->col != mat_right->col))
+    {
+        throw MatrixCalculateError("mat_left not equal to mat_right");
+    }
+
+    if((mat_res->row != mat_left->row) || (mat_res->col != mat_left->col))
+    {
+        if(mat_res->aloc_array != nullptr)deleteMatrix(mat_res);
+        try {
+            initMatrix(mat_res, mat_left->row, mat_left->col);
+        }
+        
+    }
+    
+    for (int i = 0; i < rmc; i++)
+    {
+        res_mat->aloc_array[i] = aloc_array[i] + right_mat.aloc_array[i];
+    }
+    return res_mat;
+}
+
+void SubMatrix (Matrix *A, Matrix *B, Matrix *C)
+{
+    Matrix <MatrixType> *res_mat = new Matrix <MatrixType>(row, col);
+    for (int i = 0; i < rmc; i++)
+    {
+        res_mat->aloc_array[i] = aloc_array[i] - right_mat.aloc_array[i];
+    }
+    return res_mat;
 }
 
 int main ()
