@@ -1,20 +1,24 @@
 #include <iostream>
 #include <algorithm>
 #include <string>
-
 class MatrixCalculateError
 {
 public:
     MatrixCalculateError () {}
 
-    MatrixCalculateError(char* str)
+    MatrixCalculateError (const char str[])
+    {
+        msg = std::string(str);
+    }
+
+    MatrixCalculateError (std::string &str)
     {
         msg = str;
     }
 
-    MatrixCalculateError(MatrixCalculateError& const rhs)
+    MatrixCalculateError (MatrixCalculateError& rhs)
     {
-        this->msg = rhs.msg;
+        msg = rhs.msg;
     }
 
     std::string msg;
@@ -55,63 +59,88 @@ inline std::ostream &operator<< (std::ostream &out_s, Matrix const &out_mat)
     return out_s;
 }
 
-void initMatrix (Matrix *mat, int const size_row, int const size_col)
+void initMatrix (Matrix &mat, int const size_row, int const size_col)
 {
-    mat->rmc = size_row * size_col;
-    mat->aloc_array = new int[mat->rmc];
-    mat->row = size_row;
-    mat->col = size_col;
+    mat.rmc = size_row * size_col;
+    mat.aloc_array = new int[mat.rmc];
+    mat.row = size_row;
+    mat.col = size_col;
 }
 
-void inputMatrix (Matrix *mat)
+void inputMatrix (Matrix &mat)
 {
     using std::cin;
 
-    for (int i = 0; i < rmc; i++)
+    for (int i = 0; i < mat.rmc; i++)
     {
-        cin >> mat->aloc_array[i];
+        cin >> mat.aloc_array[i];
     }
     return ;
 }
 
-void *deleteMatrix (Matrix *mat)
+void deleteMatrix (Matrix &mat)
 {
-    delete[] mat->aloc_array;
-    mat->aloc_array = nullptr;
-    mat->rmc = mat->row = mat->col = 0;
+    delete[] mat.aloc_array;
+    mat.aloc_array = nullptr;
+    mat.rmc = mat.row = mat.col = 0;
 }
 
-void addMatrix (Matrix const *mat_left, Matrix const *mat_right, Matrix *mat_res)
+void tryDeleteMatrix(Matrix &mat)
 {
-    if((mat_left->row != mat_right->row) || (mat_left->col != mat_right->col))
+    if(mat.aloc_array != nullptr)delete[] mat.aloc_array;
+    mat.aloc_array = nullptr;
+    mat.rmc = mat.row = mat.col = 0;
+
+}
+
+void addMatrix (Matrix const &mat_left, Matrix const &mat_right, Matrix &mat_res)
+{
+    if((mat_left.row != mat_right.row) || (mat_left.col != mat_right.col))
     {
-        throw MatrixCalculateError("mat_left not equal to mat_right");
+        throw "mat_left not equal to mat_right";//MatrixCalculateError("mat_left not equal to mat_right");
     }
 
-    if((mat_res->row != mat_left->row) || (mat_res->col != mat_left->col))
+    if((mat_res.row != mat_left.row) || (mat_res.col != mat_left.col))
     {
-        if(mat_res->aloc_array != nullptr)deleteMatrix(mat_res);
+        if(mat_res.aloc_array != nullptr)deleteMatrix(mat_res);
         try {
-            initMatrix(mat_res, mat_left->row, mat_left->col);
+            initMatrix(mat_res, mat_left.row, mat_left.col);
         }
-        
+        catch (std::bad_alloc &e)
+        {
+            throw e;
+        }
     }
     
-    for (int i = 0; i < rmc; i++)
+    for (int i = 0; i < mat_res.rmc; i++)
     {
-        res_mat->aloc_array[i] = aloc_array[i] + right_mat.aloc_array[i];
+        mat_res.aloc_array[i] = mat_left.aloc_array[i] + mat_right.aloc_array[i];
     }
-    return res_mat;
 }
 
-void SubMatrix (Matrix *A, Matrix *B, Matrix *C)
+void subMatrix (Matrix const &mat_left, Matrix const &mat_right, Matrix &mat_res)
 {
-    Matrix <MatrixType> *res_mat = new Matrix <MatrixType>(row, col);
-    for (int i = 0; i < rmc; i++)
+    if((mat_left.row != mat_right.row) || (mat_left.col != mat_right.col))
     {
-        res_mat->aloc_array[i] = aloc_array[i] - right_mat.aloc_array[i];
+        throw "mat_left not equal to mat_right";//MatrixCalculateError("mat_left not equal to mat_right");
     }
-    return res_mat;
+
+    if((mat_res.row != mat_left.row) || (mat_res.col != mat_left.col))
+    {
+        if(mat_res.aloc_array != nullptr)deleteMatrix(mat_res);
+        try {
+            initMatrix(mat_res, mat_left.row, mat_left.col);
+        }
+        catch (std::bad_alloc &e)
+        {
+            throw e;
+        }
+    }
+
+    for (int i = 0; i < mat_res.rmc; i++)
+    {
+        mat_res.aloc_array[i] = mat_left.aloc_array[i] - mat_right.aloc_array[i];
+    }
 }
 
 int main ()
@@ -120,23 +149,23 @@ int main ()
     using std::cout;
     using std::endl;
 
-    Matrix <int> *A = new Matrix <int> (4, 5);
-    Matrix <int> *B = new Matrix <int> (4, 5);
+    Matrix A, B, C;
+    
+    initMatrix(A, 4, 5);
+    initMatrix(B, 4, 5);
 
-    A->initfs ();
+    inputMatrix(A);
+    inputMatrix(B);
+    
+    addMatrix(A, B, C);
+    cout << "A+B:" << endl << C << endl;
 
-    B->initfs ();
+    subMatrix(A, B, C);
+    cout << "A-B:" << endl << C << endl;
 
-    Matrix <int> *C = (*A) + (*B);
-    cout << "A+B:" << endl << *C << endl;
-    delete C;
-
-    C = (*A) - (*B);
-    cout << "A-B:" << endl << *C << endl;
-    delete C;
-
-    delete A;
-    delete B;
+    tryDeleteMatrix(A);
+    tryDeleteMatrix(B);
+    tryDeleteMatrix(C);
     
     return 0;
 }
