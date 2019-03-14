@@ -6,7 +6,7 @@ class MatrixCalculateError
 public:
     MatrixCalculateError () {}
 
-    MatrixCalculateError (const char str[])
+    MatrixCalculateError (const char *str)
     {
         msg = std::string(str);
     }
@@ -16,11 +16,17 @@ public:
         msg = str;
     }
 
-    MatrixCalculateError (MatrixCalculateError& rhs)
+    MatrixCalculateError (const MatrixCalculateError &rhs)
     {
         msg = rhs.msg;
     }
 
+    const char* what() const
+    {
+        return msg.c_str();
+    }
+
+protected:
     std::string msg;
 };
 
@@ -62,7 +68,14 @@ inline std::ostream &operator<< (std::ostream &out_s, Matrix const &out_mat)
 void initMatrix (Matrix &mat, int const size_row, int const size_col)
 {
     mat.rmc = size_row * size_col;
-    mat.aloc_array = new int[mat.rmc];
+    try 
+    {
+        mat.aloc_array = new int[mat.rmc];
+    }
+    catch(...)
+    {
+        throw ;
+    }
     mat.row = size_row;
     mat.col = size_col;
 }
@@ -90,20 +103,20 @@ void tryDeleteMatrix(Matrix &mat)
     if(mat.aloc_array != nullptr)delete[] mat.aloc_array;
     mat.aloc_array = nullptr;
     mat.rmc = mat.row = mat.col = 0;
-
 }
 
 void addMatrix (Matrix const &mat_left, Matrix const &mat_right, Matrix &mat_res)
 {
     if((mat_left.row != mat_right.row) || (mat_left.col != mat_right.col))
     {
-        throw "mat_left not equal to mat_right";//MatrixCalculateError("mat_left not equal to mat_right");
+        throw MatrixCalculateError("mat_left not equal to mat_right");
     }
 
     if((mat_res.row != mat_left.row) || (mat_res.col != mat_left.col))
     {
         if(mat_res.aloc_array != nullptr)deleteMatrix(mat_res);
-        try {
+        try
+        {
             initMatrix(mat_res, mat_left.row, mat_left.col);
         }
         catch (std::bad_alloc &e)
@@ -122,18 +135,19 @@ void subMatrix (Matrix const &mat_left, Matrix const &mat_right, Matrix &mat_res
 {
     if((mat_left.row != mat_right.row) || (mat_left.col != mat_right.col))
     {
-        throw "mat_left not equal to mat_right";//MatrixCalculateError("mat_left not equal to mat_right");
+        throw MatrixCalculateError("mat_left not equal to mat_right");
     }
 
     if((mat_res.row != mat_left.row) || (mat_res.col != mat_left.col))
     {
         if(mat_res.aloc_array != nullptr)deleteMatrix(mat_res);
-        try {
+        try
+        {
             initMatrix(mat_res, mat_left.row, mat_left.col);
         }
-        catch (std::bad_alloc &e)
+        catch (...)
         {
-            throw e;
+            throw ;
         }
     }
 
@@ -157,16 +171,49 @@ int main ()
     inputMatrix(A);
     inputMatrix(B);
     
-    addMatrix(A, B, C);
-    cout << "A+B:" << endl << C << endl;
+    try
+    {
+        addMatrix(A, B, C);
+        cout << "A+B:" << endl << C << endl;
+    }
+    catch (MatrixCalculateError &e)
+    {
+        std::cerr << "MatrixCalculateError when calculating A + B: " << e.what() << endl;
+    }
+    catch (std::exception &e)
+    {
+        std::cerr << "StandardError when calculating A + B: " << e.what() << endl;
+    }
+    catch (...)
+    {
+        tryDeleteMatrix(A);
+        tryDeleteMatrix(B);
+        tryDeleteMatrix(C);
+    }
 
-    subMatrix(A, B, C);
-    cout << "A-B:" << endl << C << endl;
+    try
+    {
+        subMatrix(A, B, C);
+        cout << "A-B:" << endl << C << endl;
+    }
+    catch (MatrixCalculateError &e)
+    {
+        std::cerr << "MatrixCalculateError when calculating A - B: " << e.what() << endl;
+    }
+    catch (std::exception &e)
+    {
+        std::cerr << "StandardError when calculating A - B: " << e.what() << endl;
+    }
+    catch(...)
+    {
+        tryDeleteMatrix(A);
+        tryDeleteMatrix(B);
+        tryDeleteMatrix(C);
+    }
 
     tryDeleteMatrix(A);
     tryDeleteMatrix(B);
     tryDeleteMatrix(C);
-    
     return 0;
 }
 
@@ -180,4 +227,14 @@ int main ()
 1 2 3 4 2
 3 1 2 4 5
 3 1 2 4 5
+
+0 0 1 0 5
+1 2 3 4 2
+1 2 2 2 2
+3 3 3 3 3
+
+5 4 3 2
+1 2 3 4
+3 1 2 4
+3 1 2 4
 */
