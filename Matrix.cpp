@@ -184,12 +184,6 @@ int main ()
     {
         std::cerr << "StandardError when calculating A + B: " << e.what() << endl;
     }
-    catch (...)
-    {
-        tryDeleteMatrix(A);
-        tryDeleteMatrix(B);
-        tryDeleteMatrix(C);
-    }
 
     try
     {
@@ -203,12 +197,6 @@ int main ()
     catch (std::exception &e)
     {
         std::cerr << "StandardError when calculating A - B: " << e.what() << endl;
-    }
-    catch(...)
-    {
-        tryDeleteMatrix(A);
-        tryDeleteMatrix(B);
-        tryDeleteMatrix(C);
     }
 
     tryDeleteMatrix(A);
