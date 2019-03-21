@@ -1,4 +1,9 @@
+
+// #define DEBUG
+#define SAFEMATRIX
+
 #include <iostream>
+
 #include "MatrixH.h"
 using namespace MatrixSpace;
 
@@ -11,24 +16,31 @@ int main ()
     Matrix <int> *A = new Matrix <int> (4, 5);
     Matrix <int> *B = new Matrix <int> (4, 5);
 
-
     cout << "Please input a Matrix <int> (4 * 5)" << endl;
     A->initfs ();
 
     cout << "Please input a Matrix <int> (4 * 5)" << endl;
     B->initfs ();
 
+    (*A)[0][0] = 123;
     Matrix <int> *C = (*A) + (*B);
     cout << "A+B:" << endl << *C << endl;
     delete C;
+    C = nullptr;
 
     C = (*A) - (*B);
     cout << "A-B:" << endl << *C << endl;
+
     delete C;
-
+    C = nullptr;
     delete A;
+    A = nullptr;
     delete B;
+    B = nullptr;
 
+    # ifdef DEBUG
+    cout << globtest << endl;
+    # endif
     return 0;
 }
 
