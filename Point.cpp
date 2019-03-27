@@ -1,6 +1,3 @@
-
-// # define DEBUG
-
 #include <iostream>
 #include <cmath>
 
@@ -9,7 +6,6 @@ int globtest = 0;
 # endif
 
 class Point;
-class Circle;
 
 /*
  * 包含自定义的浮点数方法
@@ -125,6 +121,26 @@ public:
         # endif
     }
 
+    Point operator++ () const
+    {
+        return Point(lfx + 1, lfy + 1);
+    }
+    
+    Point operator++ (int) const
+    {
+        return Point(lfx + 1, lfy + 1);
+    }
+
+    Point operator-- () const
+    {
+        return Point(lfx - 1, lfy - 1);
+    }
+    
+    Point operator-- (int) const
+    {
+        return Point(lfx - 1, lfy - 1);
+    }
+
     /*
      * 距离函数
      * @right_pt: 传入一个右点
@@ -173,112 +189,25 @@ std::istream &operator>> (std::istream &ins, Point &left_Point)
     return ins;
 }
 
-
-/*
- * class Circle
- * 圆类
- *
- * 重载了构造函数，析构函数等
- * 包含public函数initfs和intersect
- */
-class Circle
+int main()
 {
-private:
-
-    double rad;
-    Point *center;
-
-public:
-    Circle ()
-    {
-        rad = 0;
-        center = new Point();
-        # ifdef DEBUG
-        std::cout << "Circle(" << reinterpret_cast<unsigned long long>(this) << ") constructed" << std::endl;
-        globtest++;
-        # endif
-    }
-    Circle (Circle const &right_circle)
-    {
-        rad = right_circle.rad;
-        center = new Point(right_circle.center);
-        # ifdef DEBUG
-        std::cout << "Circle(" << reinterpret_cast<unsigned long long>(this) << ") constructed" << std::endl;
-        globtest++;
-        # endif
-    }
-    Circle (double const &radius, Point const &_center)
-    {
-        rad = radius;
-        center = new Point(_center);
-        # ifdef DEBUG
-        std::cout << "Circle(" << reinterpret_cast<unsigned long long>(this) << ") constructed" << std::endl;
-        globtest++;
-        # endif
-    }
-    Circle (double const &radius, double const &x, double const &y)
-    {
-        rad = radius;
-        center = new Point(x, y);
-        # ifdef DEBUG
-        std::cout << "Circle(" << reinterpret_cast<unsigned long long>(this) << ") constructed" << std::endl;
-        globtest++;
-        # endif
-    }
-    ~Circle ()
-    {
-        delete center;
-        # ifdef DEBUG
-        std::cout << "Circle(" << reinterpret_cast<unsigned long long>(this) << ") destructed" << std::endl;
-        globtest--;
-        # endif
-    }
-    void initfs ()
-    {
-        using std::cin;
-		using std::cout;
-		using std::endl;
-
-		cout << "Please input the radius(double):" << endl;
-		cin >> rad;
-
-		cout << "Please input the Point(double, double):" << endl;
-		cin >> *center;
-    }
-	inline bool intersect (Circle const &right_circle) const
-	{
-		double dis = dist(*center, *right_circle.center);
-		return (flt::sgn(std::fabs(rad - right_circle.rad) - dis) <= 0) &&
-			(flt::sgn(dis - (rad + right_circle.rad)) <= 0);
-	}
-};
-
-int main ()
-{
-    Circle *cir1 = new Circle (), *cir2 = new Circle ();
-
-	cir1->initfs ();
-	cir2->initfs ();
-
-    std::cout << (cir1->intersect(*cir2) ? "Intersect" : "Not intersect") << std::endl;
-
-    delete cir1;
-    delete cir2;
-    cir1 = cir2 = nullptr;
-
-    # ifdef DEBUG
-    std::cout << globtest << std::endl;
-    # endif
-
-    return 0;
+    using std::cin;
+    using std::cout;
+    using std::endl;
+    Point pt;
+    
+    cout << "Initialize: (" << pt << ")" << endl;
+    cout << "Please Input a Point(double,double)?" << endl;
+    cin >> pt;
+    cout << "Inputed: (" << pt << ")" << endl;
+    cout << "Point++" << endl;
+    cout << "(" << pt++ << ")" << endl;
+    cout << "++Point" << endl;
+    cout << "(" << ++pt << ")" << endl;
+    cout << "Point--" << endl;
+    cout << "(" << pt-- << ")" << endl;
+    cout << "--Point" << endl;
+    cout << "(" << --pt << ")" << endl;
+    
+    system("pause");
 }
-/*
-1 0 0
-1 2 0
-
-1 0 0
-2 2 0
-
-1 0 0
-10 2 0
-*/

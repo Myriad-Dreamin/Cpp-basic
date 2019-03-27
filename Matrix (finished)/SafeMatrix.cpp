@@ -47,8 +47,7 @@ namespace MatrixSpace
             std::cout << reinterpret_cast<unsigned long long>(aloc_array) << " allocated" << std::endl;
             globtest++;
             # endif
-        }
-        catch(...) {
+        } catch(...) {
             throw ;
         }
     }

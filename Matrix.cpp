@@ -37,7 +37,7 @@ struct Matrix
 
     int *aloc_array;
 
-    Matrix()
+    Matrix ()
     {
         row = col = rmc = 0;
         aloc_array = nullptr;
@@ -54,12 +54,12 @@ struct Matrix
 
 inline std::ostream &operator<< (std::ostream &out_s, Matrix const &out_mat)
 {
-    for (int i = 0; i < out_mat.row; i++)
-    {
-        if (i != 0)out_s << '\n';
-        for (int j = 0; j < out_mat.col; j++)
-        {
-            if ( j != 0)out_s << ' ';
+    for (int i = 0; i < out_mat.row; i++) {
+        if (i != 0)
+            out_s << '\n';
+        for (int j = 0; j < out_mat.col; j++) {
+            if ( j != 0)
+                out_s << ' ';
             out_s << out_mat[i][j];
         }
     }
@@ -68,15 +68,12 @@ inline std::ostream &operator<< (std::ostream &out_s, Matrix const &out_mat)
 
 void initMatrix (Matrix &mat, int const size_row, int const size_col)
 {
-    try
-    {
+    try {
         mat.rmc = size_row * size_col;
         mat.aloc_array = new int[mat.rmc];
         mat.row = size_row;
         mat.col = size_col;
-    }
-    catch(...)
-    {
+    } catch(...) {
         throw ;
     }
     return ;
@@ -86,8 +83,7 @@ void inputMatrix (Matrix &mat)
 {
     using std::cin;
 
-    for (int i = 0; i < mat.rmc; i++)
-    {
+    for (int i = 0; i < mat.rmc; i++) {
         cin >> mat.aloc_array[i];
     }
     return ;
@@ -102,65 +98,52 @@ void deleteMatrix (Matrix &mat)
 
 void tryDeleteMatrix(Matrix &mat)
 {
-    if(mat.aloc_array != nullptr)delete[] mat.aloc_array;
+    if(mat.aloc_array != nullptr)
+        delete[] mat.aloc_array;
     mat.aloc_array = nullptr;
     mat.rmc = mat.row = mat.col = 0;
 }
 
 void addMatrix (Matrix const &mat_left, Matrix const &mat_right, Matrix &mat_res)
 {
-    if((mat_left.row != mat_right.row) || (mat_left.col != mat_right.col))
-    {
+    if((mat_left.row != mat_right.row) || (mat_left.col != mat_right.col)) {
         throw MatrixCalculateError("mat_left is not able to calculate with mat_right");
     }
 
-    if((mat_res.row != mat_left.row) || (mat_res.col != mat_left.col))
-    {
-        try
-        {
-            if(mat_res.aloc_array != nullptr)
-            {
+    if((mat_res.row != mat_left.row) || (mat_res.col != mat_left.col)) {
+        try {
+            if(mat_res.aloc_array != nullptr) {
                 deleteMatrix(mat_res);
             }
             initMatrix(mat_res, mat_left.row, mat_left.col);
-        }
-        catch (std::bad_alloc &e)
-        {
+        } catch (std::bad_alloc &e) {
             throw e;
         }
     }
 
-    for (int i = 0; i < mat_res.rmc; i++)
-    {
+    for (int i = 0; i < mat_res.rmc; i++) {
         mat_res.aloc_array[i] = mat_left.aloc_array[i] + mat_right.aloc_array[i];
     }
 }
 
 void subMatrix (Matrix const &mat_left, Matrix const &mat_right, Matrix &mat_res)
 {
-    if((mat_left.row != mat_right.row) || (mat_left.col != mat_right.col))
-    {
+    if((mat_left.row != mat_right.row) || (mat_left.col != mat_right.col)) {
         throw MatrixCalculateError("mat_left is not able to calculate with mat_right");
     }
 
-    if((mat_res.row != mat_left.row) || (mat_res.col != mat_left.col))
-    {
-        try
-        {
-            if(mat_res.aloc_array != nullptr)
-            {
+    if((mat_res.row != mat_left.row) || (mat_res.col != mat_left.col)) {
+        try {
+            if(mat_res.aloc_array != nullptr) {
                 deleteMatrix(mat_res);
             }
             initMatrix(mat_res, mat_left.row, mat_left.col);
-        }
-        catch (...)
-        {
+        } catch (...) {
             throw ;
         }
     }
 
-    for (int i = 0; i < mat_res.rmc; i++)
-    {
+    for (int i = 0; i < mat_res.rmc; i++) {
         mat_res.aloc_array[i] = mat_left.aloc_array[i] - mat_right.aloc_array[i];
     }
 }
@@ -181,31 +164,21 @@ int main ()
     cout << "Please input a Matrix <int> (4 * 5)" << endl;
     inputMatrix(B);
 
-    try
-    {
+    try {
         addMatrix(A, B, C);
         cout << "A+B:" << endl << C << endl;
-    }
-    catch (MatrixCalculateError &e)
-    {
+    } catch (MatrixCalculateError &e) {
         std::cerr << "MatrixCalculateError when calculating A + B: " << e.what() << endl;
-    }
-    catch (std::exception &e)
-    {
+    } catch (std::exception &e) {
         std::cerr << "StandardError when calculating A + B: " << e.what() << endl;
     }
 
-    try
-    {
+    try {
         subMatrix(A, B, C);
         cout << "A-B:" << endl << C << endl;
-    }
-    catch (MatrixCalculateError &e)
-    {
+    } catch (MatrixCalculateError &e) {
         std::cerr << "MatrixCalculateError when calculating A - B: " << e.what() << endl;
-    }
-    catch (std::exception &e)
-    {
+    } catch (std::exception &e) {
         std::cerr << "StandardError when calculating A - B: " << e.what() << endl;
     }
 

@@ -13,14 +13,14 @@ int globtest = 0;
 /*
  * SafeMatrix
  *
- * ÔÚÒ»¶¨³Ì¶ÈÉÏ±£Ö¤°²È«ĞÔ
+ * åœ¨ä¸€å®šç¨‹åº¦ä¸Šä¿è¯å®‰å…¨æ€§
  */
 namespace MatrixSpace
 {
 	/*
  * MatrixError
  *
- * ¾ØÕóExceptionsµÄÊµÏÖ
+ * çŸ©é˜µExceptionsçš„å®ç°
  */
 
 	MatrixCalculateError::MatrixCalculateError()
@@ -161,9 +161,9 @@ namespace MatrixSpace
 	template <typename MT>
 	const Matrix<MT> Matrix<MT>::operator= (Matrix<MT> const &right_mat)
 	{
-		// ¼ì²é×Ô¸³Öµ
+		// æ£€æŸ¥è‡ªèµ‹å€¼
 		if (this != &right_mat) {
-			// ¼ì²éaloc_arrayÎÊÌâ
+			// æ£€æŸ¥aloc_arrayé—®é¢˜
 			if (aloc_array != nullptr && rmc != right_mat.rmc) {
 # ifdef DEBUG
 				std::cout << reinterpret_cast<unsigned long long>(aloc_array) << " freed" << std::endl;

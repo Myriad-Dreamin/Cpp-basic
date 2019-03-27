@@ -7,58 +7,62 @@
 namespace MatrixSpace
 {
     /*
-     * MatrixCalculateError:
-     *
+     * 当Matrix运行中发生异常/错误时，抛出该Exception
+     * 使用MatrixError("Exception Descript...")产生一个Exception
+     * 必须传入异常说明，不允许无参构造
+     */
+    class MatrixError
+    {
+    protected:
+        
+        // err_desc: 错误信息的描述
+        std::string err_desc;
+    
+    public:
+        
+        /*
+         * 构造函数
+         * @str: 常量字符串
+         *
+         * 传入一个常量字符串初始化MatrixError
+         */
+        MatrixError (const char *str);
+        
+        /*
+         * 构造函数
+         * @str: 常量字符串
+         *
+         * 传入一个常量字符串初始化MatrixError
+         */
+        MatrixError (std::string &str);
+        
+        /*
+         * 拷贝构造函数
+         * @mat_err: 其他MatrixError
+         *
+         * 传入一个常量字符串初始化MatrixError
+         */
+        MatrixError (const MatrixError &mat_err);
+        
+        /*
+         * @ret: 返回一个字符串，为MatrixError的描述
+         */
+        const char *what() const;
+    };
+
+    /*
      * 当Matrix二元运算不匹配时，发生该Exception
      * 使用MatrixCalculateError("Exception Descript...")产生一个Exception
      */
-    class MatrixCalculateError
-    {
-    public:
-
-        MatrixCalculateError () {}
-
-        MatrixCalculateError (const char *str);
-
-        MatrixCalculateError (std::string &str);
-
-        MatrixCalculateError (const MatrixCalculateError &rhs);
-
-        const char *what() const;
-
-    protected:
-
-        std::string msg;
-    };
+    typedef MatrixError MatrixCalculateError;
 
     /*
-     * MatrixReferenceError:
-     *
      * 当访问超过了Matrix的行大小时，发生此错误
      * 使用MatrixCalculateError("Exception Descript...")产生一个Exception
      */
-    class MatrixReferenceError
-    {
-    public:
-
-        MatrixReferenceError () {}
-
-        MatrixReferenceError (const char *str);
-
-        MatrixReferenceError (std::string &str);
-
-        MatrixReferenceError (const MatrixReferenceError &rhs);
-
-        const char *what() const;
-
-    protected:
-
-        std::string msg;
-    };
+    typedef MatrixError MatrixReferenceError;
 
     /*
-     * Matrix<MatrixType>:
-     *
      * 一个泛型的矩阵类，支持加减运算
      * 如果你定义了预编译宏 SAFEMATRIX 类会帮你检查可能的错误，否则它会相信你的所有举止都是聪明的。
      *
