@@ -1,5 +1,5 @@
 
-// # define DEBUG
+# define DEBUG
 
 #include <iostream>
 #include <cstring>
@@ -22,11 +22,16 @@ using std::cerr;
 
 const int TEST_SIZE = 1000;
 typedef int arr_element;
+typedef void (*SORT_FUNCP)(const arr_element[],const int);
 enum time_unit {musec, misec, sec};
 
 
 auto random_seed = std::chrono::high_resolution_clock::now().time_since_epoch().count();
 arr_element test_space[TEST_SIZE], generate_space[TEST_SIZE];
+
+
+void random_init(arr_element load_arr[], const int len);
+void print_arr(const arr_element load_arr[], const int len);
 
 class stop_watch
 {
@@ -99,6 +104,21 @@ protected:
         }
         memcpy(arr, input_arr, sizeof(arr_element) * len);    
     }
+
+    void run (const arr_element input_arr[], const int len, SORT_FUNCP sort_func)
+    {
+        try {
+            prepare(input_arr, len);
+        } catch (...) {
+            throw ;
+        }
+        
+        sort_func(arr, len);
+        
+        # ifdef DEBUG
+        print_arr(arr, 10);
+        # endif
+    }
 public:
     Sort ()
     {
@@ -143,17 +163,10 @@ public:
 
 class InsertionSort: public Sort
 {
-public:
-    InsertionSort(): Sort() {}
-
-    void simple(const arr_element input_arr[], const int len)
+private:
+    void _simple (const arr_element input_arr[], int const len)
     {
         int tmp, j;
-        try {
-            prepare(input_arr, len);
-        } catch (...) {
-            throw ;
-        }
         begin_clock();
         for (int i=1; i<len; i++) {
             tmp = arr[i];
@@ -165,6 +178,14 @@ public:
             arr[j + 1] = tmp;
         }
         end_clock();
+    }
+public:
+    InsertionSort(): Sort() {}
+
+    void simple (const arr_element input_arr[], int const len)
+    {
+        run(input_arr, len, _simple);
+
     }
 } ins_sort;
 
@@ -194,5 +215,7 @@ int main()
 {
     random_init(generate_space, 10);
     print_arr(generate_space, 10);
+    ins_sort.simple(generate_space, 10);
+    ins_sort.show();
     return 0;
 }
