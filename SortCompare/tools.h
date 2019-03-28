@@ -25,15 +25,6 @@ typedef int arr_element;
 
 
 enum time_unit {musec, misec, sec};
-enum iofstream_flag : unsigned char
-{
-    app_flag       = 1 << 0,
-    ate_flag       = 1 << 1,
-    binary_flag    = 1 << 2,
-    in_flag        = 1 << 3,
-    out_flag       = 1 << 4,
-    trunc_flag     = 1 << 5
-};
 
 class stop_watch
 {
@@ -56,6 +47,7 @@ public:
     void start ()
     {
         QueryPerformanceCounter(&watch_begin_time);
+        return ;
     }
 
     void stop ()
@@ -63,17 +55,20 @@ public:
         LARGE_INTEGER watch_end_time;
         QueryPerformanceCounter(&watch_end_time);
         elapsed += (watch_end_time.QuadPart - watch_begin_time.QuadPart) * 1000000.0 / cpu_frequency.QuadPart;
+        return ;
     }
 
     void restart()
     {
         elapsed = 0;
         start();
+        return ;
     }
 
     void clear()
     {
         elapsed = 0;
+        return ;
     }
 
     //microsecond
@@ -93,44 +88,84 @@ public:
     }
 };
 
-class FileHandle {
+class CsvHandle: public std::fstream
+{
 private:
-    std::fstream handle;
-    unsigned char handle_flag;
-    bool opened;
+    std::ios_base::openmode handle_flag;
+    bool opened,newlined;
 public:
-    FileHandle ()
+    CsvHandle ()
     {
         opened = false;
+        newlined = false;
     }
+    CsvHandle (
+        const char *file_path,
+        const std::ios_base::openmode open_flag = std::ios::out | std::ios::app
+    ): std::fstream(file_path, open_flag)
+    {
+        opened = true;
+        newlined = false;
+        handle_flag = open_flag;
+    }
+
     void open (
         const char *file_path,
-        const unsigned char open_flag = iofstream_flag::out_flag | iofstream_flag::app_flag
+        const std::ios_base::openmode open_flag = std::ios::out | std::ios::app
     )
     {
         if (opened) {
-            handle.close();
+            std::fstream::close();
         }
-        handle.open(file_path,std::ios_base::openmode(open_flag));
-        handle_flag = open_flag;
+        newlined = false;
+        *this = CsvHandle(file_path, open_flag);
+        return ;
     }
-    
-    void close()
+    void close ()
     {
         if (opened) {
-            handle.close();
+            std::fstream::close();
         }
-        handle_flag = 0;
+        newlined = false;
+        opened = false;
+        return ;
+    }
+    void newline ()
+    {
+        if (!opened) {
+            throw std::domain_error("no file opened");
+        }
+        newlined = false;
+        *this << std::endl;
+        return ;
+    }
+
+    template<typename T>
+    void block(const T &out_element)
+    {
+        if (!opened) {
+            throw std::domain_error("no file opened");
+        }
+        if (newlined) {
+            *this << ",";
+        } else {
+            newlined = true;
+        }
+        *this << out_element;
+        return ;
     }
 };
 
 
 void print_arr(arr_element const load_arr[], const int len)
 {
+    # ifndef DONOTPRINT
     for (int i = 0; i < len; i++){
         std::cout << load_arr[i] << " ";
     }
     std::cout << std::endl;
+    # endif
+    return ;
 }
 
 void assert_equal(arr_element const left_arr[], arr_element const right_arr[], const int len)
@@ -139,6 +174,7 @@ void assert_equal(arr_element const left_arr[], arr_element const right_arr[], c
     {
         assert(left_arr[i] == right_arr[i]);
     }
+    return ;
 }
 
 

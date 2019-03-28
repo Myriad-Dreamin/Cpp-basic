@@ -9,11 +9,10 @@
 # define TMP_SPACE
 # define STD_SPACE
 
-
 typedef int arr_element;
 
 
-const int TEST_SIZE = 1000;
+const int TEST_SIZE = 500000;
 
 
 auto random_seed = std::chrono::high_resolution_clock::now().time_since_epoch().count();
