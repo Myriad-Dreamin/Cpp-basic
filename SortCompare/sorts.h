@@ -198,18 +198,40 @@ namespace sorts
 
     int stable_partition (arr_element arr[], int idx_arr[], const int len)
     {
+        int cnt = 0;
+        for (int i = 0; i < len; i++)
+        {
+            if (arr[i] == arr[0]) {
+                cnt++;
+            }
+        }
+        cnt >>= 1;
+        for (int i = 0; i < len; i++)
+        {
+            if (arr[i] == arr[0]) {
+                cnt--;
+            }
+            if (cnt == 0) {
+                std::swap(arr[0], arr[i]);
+                std::swap(idx_arr[0], idx_arr[i]);
+                break;
+            }
+        }
         arr_element pivot_element = arr[0];
         int pivot_idx = idx_arr[0];
-        for(int l = 0,r = len - 1;;) {
+        for (int l = 0,r = len - 1;;) {
             while (l < r && compare_func(arr[r], idx_arr[r] , pivot_element, pivot_idx) > 0)r--;
             while (l < r && compare_func(arr[l], idx_arr[l] , pivot_element, pivot_idx) <= 0)l++;
             if (l >= r) {
                 arr[0] = arr[l];
-                idx_arr[0] = idx_arr[l];
                 arr[l] = pivot_element;
+                
+                idx_arr[0] = idx_arr[l];
                 idx_arr[l] = pivot_idx;
+
                 return l;
             }
+            
             std::swap(arr[l], arr[r]);
             std::swap(idx_arr[l], idx_arr[r]);
         }
