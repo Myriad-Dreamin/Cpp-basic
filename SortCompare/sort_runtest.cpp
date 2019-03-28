@@ -10,6 +10,7 @@ InsertionSort ins_sort;
 MergeSort mer_sort;
 QuickSort quc_sort;
 STDSort std_sort;
+Generate gen(TEST_SIZE, random_seed);
 
 void test_sorts(const int len)
 {
@@ -43,13 +44,13 @@ void test_sorts(const int len)
 int main()
 {
     int test_len = 10;
-    random_init(generate_space, test_len);
+    gen.random_init(generate_space, test_len);
     test_sorts(test_len);
 
-    special_test(generate_space, test_len);
+    gen.special_test(generate_space, test_len);
     test_sorts(test_len);
 
-    special_test2(generate_space, test_len);
+    gen.special_test2(generate_space, test_len);
     test_sorts(test_len);
     return 0;
 }

@@ -2,8 +2,20 @@
 # ifndef SORTS_H
 # define SORTS_H
 
-#include "collect.h"
 
+# ifndef TYPEDEF_ARR_ELEMENT
+# define TYPEDEF_ARR_ELEMENT
+typedef int arr_element;
+# endif
+
+
+# ifndef TYPEDEF_ARR_ELEMENT
+# define TYPEDEF_ARR_ELEMENT
+arr_element tmp_space[10000005];
+# endif
+
+
+#include <algorithm>
 
 typedef void (*SORT_FUNCP)(arr_element[],const int);
 

@@ -3,7 +3,12 @@
 # ifndef TOOLS_H
 # define TOOLS_H
 
-#include "collect.h"
+
+# ifndef TYPEDEF_ARR_ELEMENT
+# define TYPEDEF_ARR_ELEMENT
+typedef int arr_element;
+# endif
+
 
 #include <iostream>
 #include <stdexcept>
@@ -122,9 +127,6 @@ public:
 
 void print_arr(arr_element const load_arr[], const int len)
 {
-    if (len > TEST_SIZE) {
-        throw std::invalid_argument("length to initialize is out of range");
-    }
     for (int i = 0; i < len; i++){
         std::cout << load_arr[i] << " ";
     }

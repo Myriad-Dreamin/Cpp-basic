@@ -2,7 +2,13 @@
 # ifndef SORT_TEST_H
 # define SORT_TEST_H
 
-#include "collect.h"
+
+# ifndef TYPEDEF_ARR_ELEMENT
+# define TYPEDEF_ARR_ELEMENT
+typedef int arr_element;
+# endif
+
+
 #include "tools.h"
 #include "sorts.h"
 #include <iostream>
@@ -44,12 +50,6 @@ protected:
         # endif
     }
 public:
-
-    Sort ()
-    {
-        arr = test_space;
-        arr_size = TEST_SIZE;
-    }
 
     Sort (arr_element *your_space, const int space_size)
     {
@@ -108,7 +108,6 @@ public:
 class InsertionSort: public Sort
 {
 public:
-    InsertionSort(): Sort() {}
     InsertionSort(arr_element *your_space, const int space_size): Sort(your_space, space_size) {}
 
     void primitive (arr_element const input_arr[], const int len)
@@ -122,7 +121,6 @@ class MergeSort: public Sort
 {
 private:
 public:
-    MergeSort (): Sort () {}
     MergeSort(arr_element *your_space, const int space_size): Sort(your_space, space_size) {}
 
     void primitive (arr_element const input_arr[], const int len)
@@ -135,7 +133,6 @@ public:
 class QuickSort: public Sort
 {
 public:
-    QuickSort (): Sort () {}
     QuickSort(arr_element *your_space, const int space_size): Sort(your_space, space_size) {}
 
     void primitive (arr_element const input_arr[], const int len)
@@ -148,14 +145,6 @@ public:
 class STDSort: public Sort
 {
 public:
-    STDSort (): Sort ()
-    {
-        # ifdef DEBUG
-        arr = std_space;
-        # else
-        arr = test_space;
-        # endif
-    }
     STDSort(arr_element *your_space, const int space_size): Sort(your_space, space_size) {}
 
     void primitive (arr_element const input_arr[], const int len)

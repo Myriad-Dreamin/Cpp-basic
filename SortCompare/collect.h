@@ -5,6 +5,10 @@
 
 #include <chrono>
 
+# define TYPEDEF_ARR_ELEMENT
+# define TMP_SPACE
+# define STD_SPACE
+
 
 typedef int arr_element;
 
