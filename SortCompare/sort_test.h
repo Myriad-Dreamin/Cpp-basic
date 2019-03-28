@@ -12,13 +12,16 @@
 class Sort
 {
 protected:
-    stop_watch self_watch;
+
     arr_element *arr;
+    int arr_size;
+
+    stop_watch self_watch;
     FileHandle self_file;
 
     void prepare (arr_element const input_arr[], const int len)
     {
-        if (len > TEST_SIZE) {
+        if (len > arr_size) {
             throw std::invalid_argument("length to copy is out of range");
         }
         memcpy(arr, input_arr, sizeof(arr_element) * len);    
@@ -45,6 +48,13 @@ public:
     Sort ()
     {
         arr = test_space;
+        arr_size = TEST_SIZE;
+    }
+
+    Sort (arr_element *your_space, const int space_size)
+    {
+        arr = your_space;
+        arr_size = space_size;
     }
 
     inline void begin_clock ()
@@ -99,6 +109,7 @@ class InsertionSort: public Sort
 {
 public:
     InsertionSort(): Sort() {}
+    InsertionSort(arr_element *your_space, const int space_size): Sort(your_space, space_size) {}
 
     void primitive (arr_element const input_arr[], const int len)
     {
@@ -112,6 +123,7 @@ class MergeSort: public Sort
 private:
 public:
     MergeSort (): Sort () {}
+    MergeSort(arr_element *your_space, const int space_size): Sort(your_space, space_size) {}
 
     void primitive (arr_element const input_arr[], const int len)
     {
@@ -124,6 +136,7 @@ class QuickSort: public Sort
 {
 public:
     QuickSort (): Sort () {}
+    QuickSort(arr_element *your_space, const int space_size): Sort(your_space, space_size) {}
 
     void primitive (arr_element const input_arr[], const int len)
     {
@@ -143,6 +156,7 @@ public:
         arr = test_space;
         #endif
     }
+    STDSort(arr_element *your_space, const int space_size): Sort(your_space, space_size) {}
 
     void primitive (arr_element const input_arr[], const int len)
     {
