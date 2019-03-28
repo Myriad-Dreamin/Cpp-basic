@@ -118,6 +118,32 @@ namespace sorts
         }
     }
 
+    int hoare_partition_with_median_of_three (arr_element arr[], const int len)
+    {
+        int m = len >> 1;
+        if (arr[len - 1] < arr[0]) {
+            std::swap(arr[len - 1], arr[0]);
+        }
+        if (arr[len - 1] < arr[m]) {
+            std::swap(arr[len - 1], arr[m]);
+        }
+        if (arr[m] < arr[0]) {
+            std::swap(arr[m], arr[0]);
+        }
+
+        arr_element pivot = arr[0];
+        for(int l = 0,r = len - 1;;) {
+            while (l < r && arr[r] > pivot)r--;
+            while (l < r && arr[l] <= pivot)l++;
+            if (l >= r) {
+                arr[0] = arr[l];
+                arr[l] = pivot;
+                return l;
+            }
+            std::swap(arr[l], arr[r]);
+        }
+    }
+
     void hoare_quick_sort (arr_element arr[], const int len)
     {
         if (len < 2)
@@ -152,6 +178,64 @@ namespace sorts
         std::random_shuffle(arr, arr+len);
         hoare_quick_sort(arr, len);
     }
+
+    inline int compare_func(
+        const arr_element &first_key_x,const int second_key_x,
+        const arr_element &first_key_y,const int second_key_y
+    )
+    {
+        if (
+            (first_key_x < first_key_y) ||
+            ((first_key_x == first_key_y) && (second_key_x < second_key_y))
+        ) {
+            return -1;
+        }
+        if ((first_key_x == first_key_y) && (second_key_x == second_key_y)) {
+            return 0;
+        }
+        return 1;
+    }
+
+    int stable_partition (arr_element arr[], int idx_arr[], const int len)
+    {
+        arr_element pivot_element = arr[0];
+        int pivot_idx = idx_arr[0];
+        for(int l = 0,r = len - 1;;) {
+            while (l < r && compare_func(arr[r], idx_arr[r] , pivot_element, pivot_idx) > 0)r--;
+            while (l < r && compare_func(arr[l], idx_arr[l] , pivot_element, pivot_idx) <= 0)l++;
+            if (l >= r) {
+                arr[0] = arr[l];
+                idx_arr[0] = idx_arr[l];
+                arr[l] = pivot_element;
+                idx_arr[l] = pivot_idx;
+                return l;
+            }
+            std::swap(arr[l], arr[r]);
+            std::swap(idx_arr[l], idx_arr[r]);
+        }
+
+    }
+
+    void sub_stable_hoare_quick_sort(arr_element arr[], int idx_arr[], const int len)
+    {
+
+    }
+
+    void stable_hoare_quick_sort (arr_element arr[], const int len)
+    {
+        if (len < 2)
+            return ;
+        
+        int *idx_arr = new int[len];
+        for (int i = 0; i < len; i++)
+        {
+            idx_arr[i] = i;
+        }
+        int pivot = stable_partition(arr, idx_arr, len);
+        sub_stable_hoare_quick_sort(arr, idx_arr, pivot);
+        sub_stable_hoare_quick_sort(arr + pivot + 1, idx_arr + pivot + 1, len - pivot - 1);
+    }
+
 }
 
 # endif
