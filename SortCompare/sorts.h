@@ -4,6 +4,7 @@
 
 #include "collect.h"
 
+
 typedef void (*SORT_FUNCP)(arr_element[],const int);
 
 

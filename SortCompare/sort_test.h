@@ -1,6 +1,6 @@
 
-# ifndef SORT_H
-# define SORT_H
+# ifndef SORT_TEST_H
+# define SORT_TEST_H
 
 #include "collect.h"
 #include "tools.h"
@@ -150,11 +150,11 @@ class STDSort: public Sort
 public:
     STDSort (): Sort ()
     {
-        #ifdef DEBUG
+        # ifdef DEBUG
         arr = std_space;
-        #else
+        # else
         arr = test_space;
-        #endif
+        # endif
     }
     STDSort(arr_element *your_space, const int space_size): Sort(your_space, space_size) {}
 
