@@ -117,8 +117,10 @@ public:
         if (opened) {
             std::fstream::close();
         }
+        std::fstream::open(file_path, open_flag);
+        opened = true;
         newlined = false;
-        *this = CsvHandle(file_path, open_flag);
+        handle_flag = open_flag;
         return ;
     }
     void close ()
@@ -175,6 +177,12 @@ void assert_equal(arr_element const left_arr[], arr_element const right_arr[], c
         assert(left_arr[i] == right_arr[i]);
     }
     return ;
+}
+
+unsigned int rand_uint()
+{
+    static unsigned int seed = time(nullptr);
+    return seed = ((seed * 23333) ^ 19991213);
 }
 
 

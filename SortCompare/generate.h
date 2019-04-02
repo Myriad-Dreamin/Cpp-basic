@@ -56,6 +56,16 @@ public:
             load_arr[i] = i;
         }
     }
+
+    void special_test3(arr_element load_arr[], const int len)
+    {
+        if (len > protect_size) {
+            throw std::invalid_argument("length to initialize is out of range");
+        }
+        for (int i = 0; i < len; i++) {
+            load_arr[i] = len - i;
+        }
+    }
 };
 
 # endif

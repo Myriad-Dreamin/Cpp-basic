@@ -15,26 +15,9 @@ using std::endl;
 
 
 STDSort std_sort(std_space, TEST_SIZE, "./std_sort.csv");
-LomutoQuickSort lom_sort(test_space, TEST_SIZE, "./lomuto_quick_sort.csv");
-HoareQuickSort hoa_sort(test_space, TEST_SIZE, "./hoare_quick_sort.csv");
-
-RandomQuickSort hoa_sort_rand(test_space, TEST_SIZE, "./random_hoare_quick_sort.csv");
-StableHoareQuickSort hoa_sort_stable(test_space, TEST_SIZE, "./stable_hoare_quick_sort.csv");
-HoareQuickSortWithMedianofThree hoa_sort_wmt(
-    test_space,
-    TEST_SIZE,
-    "./hoare_quick_sort_with_median_of_three.csv"
-);
-
-const int testing_sorts_count = 5;
-Sort *testing_sorts[testing_sorts_count] = {&lom_sort, &hoa_sort, &hoa_sort_rand, &hoa_sort_stable, &hoa_sort_wmt};
-std::string sorts_desc[testing_sorts_count] = {
-    "lomuto quick sort",
-    "hoare quick sort",
-    "random hoare quick sort",
-    "stable hoare quick sort",
-    "hoare quick sort with median of three"
-};
+MergeSort mer_sort(test_space, TEST_SIZE, "./merge_sort.csv");
+MergeSort mix_sort(test_space, TEST_SIZE, "./mixed_merge_sort.csv");
+MergeSort mul_sort(test_space, TEST_SIZE, "./mul_merge_sort.csv");
 
 Generate gen(TEST_SIZE, random_seed);
 

@@ -83,6 +83,8 @@ public:
         self_watch.clear();
     }
 
+    virtual void primitive (arr_element const input_arr[], const int len) = 0;
+
     void show (const time_unit t_unit=time_unit::musec)
     {
         using std::cout;
@@ -202,6 +204,57 @@ public:
     {
         run(input_arr, len, sorts::primitive_merge_sort);
     }
+
+    void mixed (arr_element const input_arr[], const int len)
+    {
+        run(input_arr, len, sorts::mixed_merge_sort);
+    }
+
+    void multi (arr_element const input_arr[], const int len)
+    {
+        run(input_arr, len, sorts::multi_merge_sort);
+    }
+};
+
+class MixedMergeSort: public MergeSort
+{
+private:
+public:
+    MixedMergeSort(arr_element *your_space, const int space_size): MergeSort(your_space, space_size) {}
+
+    MixedMergeSort(
+        arr_element *your_space,
+        const int space_size,
+        const char *file_path
+    ): MergeSort(your_space, space_size, file_path) {}
+
+    void primitive (arr_element const input_arr[], const int len)
+    {
+        mixed(input_arr, len);
+    }
+
+    void multi (arr_element const input_arr[], const int len)
+    {
+        run(input_arr, len, sorts::multi_merge_sort);
+    }
+};
+
+class MultiMergeSort: public MergeSort
+{
+private:
+public:
+    MultiMergeSort(arr_element *your_space, const int space_size): MergeSort(your_space, space_size) {}
+
+    MultiMergeSort(
+        arr_element *your_space,
+        const int space_size,
+        const char *file_path
+    ): MergeSort(your_space, space_size, file_path) {}
+
+    void primitive (arr_element const input_arr[], const int len)
+    {
+        multi(input_arr, len);
+    }
 };
 
 
@@ -236,9 +289,104 @@ public:
         run(input_arr, len, sorts::hoare_quick_sort_with_median_of_three);
     }
 
+    void stable_hoare (arr_element const input_arr[], const int len)
+    {
+        run(input_arr, len, sorts::stable_hoare_quick_sort);
+    }
+
     void lomuto (arr_element const input_arr[], const int len)
     {
         run(input_arr, len, sorts::lomuto_quick_sort);
+    }
+};
+
+class HoareQuickSort: public QuickSort
+{
+public:
+    HoareQuickSort(arr_element *your_space, const int space_size): QuickSort(your_space, space_size) {}
+
+    HoareQuickSort(
+        arr_element *your_space,
+        const int space_size,
+        const char *file_path
+    ): QuickSort(your_space, space_size, file_path) {}
+
+    void primitive (arr_element const input_arr[], const int len)
+    {
+        hoare(input_arr, len);
+    }
+};
+
+class RandomQuickSort: public QuickSort
+{
+public:
+    RandomQuickSort(arr_element *your_space, const int space_size): QuickSort(your_space, space_size) {}
+
+    RandomQuickSort(
+        arr_element *your_space,
+        const int space_size,
+        const char *file_path
+    ): QuickSort(your_space, space_size, file_path) {}
+
+    void primitive (arr_element const input_arr[], const int len)
+    {
+        random_hoare(input_arr, len);
+    }
+};
+
+class HoareQuickSortWithMedianofThree: public QuickSort
+{
+public:
+    HoareQuickSortWithMedianofThree(arr_element *your_space, const int space_size): QuickSort(your_space, space_size) {}
+
+    HoareQuickSortWithMedianofThree(
+        arr_element *your_space,
+        const int space_size,
+        const char *file_path
+    ): QuickSort(your_space, space_size, file_path) {}
+
+    void primitive (arr_element const input_arr[], const int len)
+    {
+        hoare_with_median_of_three(input_arr, len);
+    }
+};
+
+class StableHoareQuickSort: public QuickSort
+{
+public:
+    StableHoareQuickSort(arr_element *your_space, const int space_size): QuickSort(your_space, space_size) {}
+
+    StableHoareQuickSort(
+        arr_element *your_space,
+        const int space_size,
+        const char *file_path
+    ): QuickSort(your_space, space_size, file_path) {}
+
+    void primitive (arr_element const input_arr[], const int len)
+    {
+        stable_hoare(input_arr, len);
+    }
+
+    void lomuto (arr_element const input_arr[], const int len)
+    {
+        run(input_arr, len, sorts::lomuto_quick_sort);
+    }
+};
+
+class LomutoQuickSort: public QuickSort
+{
+public:
+    LomutoQuickSort(arr_element *your_space, const int space_size): QuickSort(your_space, space_size) {}
+
+    LomutoQuickSort(
+        arr_element *your_space,
+        const int space_size,
+        const char *file_path
+    ): QuickSort(your_space, space_size, file_path) {}
+
+    void primitive (arr_element const input_arr[], const int len)
+    {
+        lomuto(input_arr, len);
     }
 };
 
