@@ -1,0 +1,32 @@
+3000,288,mus,standard sort | random_init
+3000,334,mus,primitive merge sort | random_init
+3000,350,mus,mixed merge sort | random_init
+3000,319,mus,multiway merge sort | random_init
+3000,165,mus,standard sort | special_test
+3000,208,mus,primitive merge sort | special_test
+3000,159,mus,mixed merge sort | special_test
+3000,159,mus,multiway merge sort | special_test
+3000,80,mus,standard sort | special_test2
+3000,160,mus,primitive merge sort | special_test2
+3000,182,mus,mixed merge sort | special_test2
+3000,173,mus,multiway merge sort | special_test2
+3000,115,mus,standard sort | special_test2
+3000,159,mus,primitive merge sort | special_test2
+3000,159,mus,mixed merge sort | special_test2
+3000,159,mus,multiway merge sort | special_test2
+3000,286,mus,standard sort | random_init
+3000,332,mus,primitive merge sort | random_init
+3000,460,mus,mixed merge sort | random_init
+3000,358,mus,multiway merge sort | random_init
+3000,157,mus,standard sort | special_test
+3000,183,mus,primitive merge sort | special_test
+3000,159,mus,mixed merge sort | special_test
+3000,159,mus,multiway merge sort | special_test
+3000,81,mus,standard sort | special_test2
+3000,161,mus,primitive merge sort | special_test2
+3000,160,mus,mixed merge sort | special_test2
+3000,193,mus,multiway merge sort | special_test2
+3000,86,mus,standard sort | special_test2
+3000,160,mus,primitive merge sort | special_test2
+3000,160,mus,mixed merge sort | special_test2
+3000,160,mus,multiway merge sort | special_test2
