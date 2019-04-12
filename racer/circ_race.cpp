@@ -36,7 +36,7 @@ int main()
         sche[i] = new int[n];
     }
     schedule(sche, n);
-    schedule2(sche, n);
+    // schedule2(sche, n);
     printf("id      |");
     for (int i = 0; i < n; i++) {
         if (i) {

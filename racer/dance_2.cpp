@@ -20,7 +20,6 @@ public:
 protected:
     bool prepared;
     std::vector<scenarios> gen_nodes;
-    std::vector<scenarios_pt> gen[N + 2];
     std::bitset<N + 2> compared[N + 2];
     scenarios_pt sche[N + 2];
 
@@ -30,7 +29,6 @@ protected:
     void generate()
     {
         static scenarios srs;
-        std::cout << unselected.size() << std::endl;
         if (!unselected.size()) {
             gen_nodes.push_back(srs);
             return ;
@@ -62,9 +60,8 @@ protected:
         unselected.push(cur);
     }
 
-    inline bool check (scenarios_pt scs_pt)
+    inline bool check (scenarios &scs)
     {
-        auto &scs = *scs_pt;
         for (auto pairs: scs) {
             if(compared[pairs.first][pairs.second]) {
                 return false;
@@ -73,53 +70,14 @@ protected:
         return true;
     }
 
-    inline void sign (scenarios_pt scs_pt)
+    inline void sign (scenarios &scs)
     {
-        auto &scs = *scs_pt;
         for (auto pairs: scs) {
             compared[pairs.first][pairs.second] = true;
         }
     }
 
-    inline void unsign (scenarios_pt scs_pt)
-    {
-        auto &scs = *scs_pt;
-        for (auto pairs: scs) {
-            compared[pairs.first][pairs.second] = false;
-        }
-    }
-
-    search_result dfs(int rnd_cnt)
-    {
-    	static int Nsub1 = N - 1;
-        if (rnd_cnt == Nsub1) {
-            return search_result::success;
-        }
-        int nx_cnt = rnd_cnt + 1;
-        for (int i = 0; i < gen[rnd_cnt].size(); i++) {
-            sche[rnd_cnt] = gen[rnd_cnt][i];
-            sign(gen[rnd_cnt][i]);
-            std::cout << "gen" << "("<< rnd_cnt <<")" << std::endl;
-            for (auto pairs: *gen[rnd_cnt][i]) {
-                std::cout << "(" << pairs.first << ", " << pairs.second << ") ";
-            }
-            std::cout << std::endl;
-            for (int j = i + 1; j < gen[rnd_cnt].size(); j++) {
-                if (check(gen[rnd_cnt][j])) {
-                    gen[nx_cnt].push_back(gen[rnd_cnt][j]);
-                }
-            }
-            if (dfs(nx_cnt) == search_result::success) {
-                return search_result::success;
-            }
-            unsign(gen[rnd_cnt][i]);
-            gen[nx_cnt].clear();
-        }
-        return search_result::failed;
-    }
 public:
-    
-
     ScheduleGenerator()
     {
         prepared = false;
@@ -138,10 +96,6 @@ public:
         // all node is not visited
         not_vis.set();
         generate();
-        gen[0].reserve(gen_nodes.size());
-        for (int i = 0; i < gen_nodes.size(); i++) {
-            gen[0].push_back(&gen_nodes[i]);
-        }
         // for (auto scs: gen_nodes) {
         //     for(auto pairs: scs) {
         //         std::cout << "(" << pairs.first << ", " << pairs.second << ") ";
@@ -155,7 +109,17 @@ public:
         if (prepared) {
             return sche;
         }
-        dfs(0);
+        int cur_sel=0, Nsub1 = N - 1;
+        for (unsigned i = 0; i < gen_nodes.size(); i++) {
+            if (check(gen_nodes[i])) {
+                sign(gen_nodes[i]);
+                sche[cur_sel++] = &gen_nodes[i];
+                if (cur_sel == Nsub1) {
+                    std::cout << "searched " << i + 1 << "/" << gen_nodes.size() << std::endl;
+                    break;
+                }
+            }
+        }
         prepared = true;
         return sche;
     }
@@ -184,10 +148,9 @@ void schedule_print(int **sche, int n)
 
 int main()
 {
-    const int n = 8;
+    const int n = 16;
     ScheduleGenerator<n> scheduler;
     auto sche_res = scheduler.run();
-    
     int **sche = new int*[n];
     for (int i = 0; i < n; i++) {
         sche[i] = new int[n];
