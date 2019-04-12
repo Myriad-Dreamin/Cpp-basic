@@ -1,8 +1,9 @@
 
-// # define DEBUG
+# define DEBUG
 
 #include <iostream>
 #include <cmath>
+#include <stdexcept>
 
 /*
  * namespace flt
@@ -39,6 +40,9 @@ public:
     }
 
     virtual double area () = 0;
+    //{
+    //    std::cout << "Shape area is not implemented" << std::endl;
+    //}
 };
 
 /*
@@ -49,7 +53,7 @@ public:
  * 重载了>>，<<，构造和析构函数
  * 包含一个area()方法返回矩形的面积
  */
-class Rectangle: protected Shape
+class Rectangle: public Shape
 {
 private:
 
@@ -72,14 +76,14 @@ public:
         std::cout << "Rectangle(" << reinterpret_cast<unsigned long long>(this) << ") constructed" << std::endl;
         # endif
     }
-    ~Rectangle() override
+    virtual ~Rectangle() override
     {
         # ifdef DEBUG
         std::cout << "Rectangle(" << reinterpret_cast<unsigned long long>(this) << ") destructed" << std::endl;
         # endif
     }
 
-    inline double area() override
+    virtual inline double area() override
     {
         return width * height;
     }
@@ -104,6 +108,51 @@ inline std::ostream &operator<< (std::ostream &out_s, Rectangle const &out_rec)
 }
 
 /*
+ * class Square
+ *
+ * 正方形类
+ *
+ * 重载了>>，<<，构造和析构函数
+ * 包含一个area()方法返回矩形的面积
+ */
+class Square: public Rectangle
+{
+private:
+    friend std::istream &operator>> (std::istream &is, Square const &in_rec);
+
+public:
+    Square (): Rectangle() {}
+
+    Square (double const &x): Rectangle(x,x)
+    {
+        # ifdef DEBUG
+        std::cout << "Square(" << reinterpret_cast<unsigned long long>(this) << ") constructed" << std::endl;
+        # endif
+    }
+
+    virtual ~Square()
+    {
+        # ifdef DEBUG
+        std::cout << "Square(" << reinterpret_cast<unsigned long long>(this) << ") destructed" << std::endl;
+        # endif
+    }
+
+    virtual inline double area() override
+    {
+        return width * height;
+    }
+};
+
+inline std::istream &operator>> (std::istream &in_s, Square &in_rec)
+{
+    in_s >> in_rec.width;
+    if (!in_s)
+        in_rec.width = double(0);
+    in_rec.height=in_rec.width;
+    return in_s;
+}
+
+/*
  * class Circle
  *
  * 圆类
@@ -111,7 +160,7 @@ inline std::ostream &operator<< (std::ostream &out_s, Rectangle const &out_rec)
  * 重载了>>,<<,构造和析构函数
  * 包含一个area()方法返回圆的面积
  */
-class Circle: protected Shape
+class Circle: public Shape
 {
 private:
 
@@ -134,14 +183,14 @@ public:
         std::cout << "Circle(" << reinterpret_cast<unsigned long long>(this) << ") constructed" << std::endl;
         # endif
     }
-    ~Circle() override
+    virtual ~Circle() override
     {
         # ifdef DEBUG
         std::cout << "Circle(" << reinterpret_cast<unsigned long long>(this) << ") constructed" << std::endl;
         # endif
     }
 
-    inline double area() override
+    virtual inline double area() override
     {
         return flt::PI * rad * rad;
     }
@@ -169,18 +218,24 @@ int main ()
     using std::endl;
     Rectangle *R = new Rectangle();
     Circle *C = new Circle();
-
+    Square *S = new Square();
+    Shape *ShapePointer = R;
     cout << "Please input a Rectangle(double, double):" << endl;
     cin >> *R;
     cout << "Please input a Circle(double):" << endl;
     cin >> *C;
+    cout << "Please input a Square(double):" << endl;
+    cin >> *S;
 
 
     cout << "R's area = "<< R->area() << endl
-              << "C's area = "<< C->area() << endl;
+              << "C's area = "<< C->area() << endl
+              << "S's area = "<< S->area() << endl
+              << "Pointer to R's area = "<< ShapePointer->area() << endl;
 
     delete R;
     delete C;
+    delete S;
 
     return 0;
 }

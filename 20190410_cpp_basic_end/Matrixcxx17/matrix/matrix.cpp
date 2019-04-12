@@ -183,8 +183,8 @@ public:
 			throw std::out_of_range("This pointer is not in memory manager now..");
 		}
 		try {
-			delete mat_p;
 			mem_maps.erase(mat_p);
+			delete mat_p;
 		} catch (...) {
 			throw ;
 		}
@@ -305,7 +305,7 @@ namespace MatrixSpace
 	template <typename MT>
 	Matrix <MT> *Matrix<MT>::operator+ (Matrix <MT> const &right_mat) const
 	{
-		if ((this->row != right_mat.row) || (this->col != right_mat.col)) {	
+		if ((this->row != right_mat.row) || (this->col != right_mat.col)) {
 			throw MatrixCalculateError("this matrix is not able to calculate with right matrix");
 		}
 
@@ -329,11 +329,11 @@ namespace MatrixSpace
 		}
 
 		Matrix <MT> *res_mat = new Matrix <MT>(row, col);
-		
+
 # ifdef MEMMANAGER
 		mem_manager.addToMap(res_mat);
 # endif
-		
+
 		for (int i = 0; i < rmc; i++) {
 			res_mat->aloc_array[i] = aloc_array[i] - right_mat.aloc_array[i];
 		}
@@ -410,7 +410,6 @@ int main()
 	cout << "Please input a Matrix <int> (4 * 5)" << endl;
 	B->initfs();
 
-	(*A)[0][0] = 123;
 	Matrix <int> *C = (*((*A) + (*B))) + (*A);
 	cout << "A+B:" << endl << *C << endl;
 	// delete C;

@@ -14,12 +14,12 @@ namespace MatrixSpace
     class MatrixError
     {
     protected:
-        
+
         // err_desc: 错误信息的描述
         std::string err_desc;
-    
+
     public:
-        
+
         /*
          * 构造函数
          * @str: 常量字符串
@@ -27,7 +27,7 @@ namespace MatrixSpace
          * 传入一个常量字符串初始化MatrixError
          */
         MatrixError (const char *str);
-        
+
         /*
          * 构造函数
          * @str: 常量字符串
@@ -35,7 +35,7 @@ namespace MatrixSpace
          * 传入一个常量字符串初始化MatrixError
          */
         MatrixError (std::string &str);
-        
+
         /*
          * 拷贝构造函数
          * @mat_err: 其他MatrixError
@@ -43,7 +43,7 @@ namespace MatrixSpace
          * 传入一个常量字符串初始化MatrixError
          */
         MatrixError (const MatrixError &mat_err);
-        
+
         /*
          * @ret: 返回一个字符串，为MatrixError的描述
          */
@@ -92,6 +92,8 @@ namespace MatrixSpace
          * 此时，矩阵的行列值均为0,数组指针为nullptr
          */
         Matrix ();
+
+        Matrix (const Matrix<MatrixType> &right_mat);
 
         /*
          * 带有行列输入的构造函数

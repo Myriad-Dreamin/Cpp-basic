@@ -53,6 +53,35 @@ namespace MatrixSpace
     }
 
     template <typename MT>
+    Matrix <MT>::Matrix (const Matrix<MT> &right_mat)
+    {
+        // 检查自赋值
+        if (this != &right_mat) {
+            // 检查aloc_array问题
+            if (aloc_array != nullptr || rmc != right_mat.rmc) {
+                # ifdef DEBUG
+                std::cout << reinterpret_cast<unsigned long long>(aloc_array) << " freed" << std::endl;
+                globtest--;
+                # endif
+
+                delete[] aloc_array;
+                aloc_array = nullptr;
+            }
+            if (aloc_array == nullptr){
+                aloc_array = new MT[right_mat.rmc];
+                # ifdef DEBUG
+                std::cout << reinterpret_cast<unsigned long long>(aloc_array) << " allocated" << std::endl;
+                globtest++;
+                # endif
+            }
+            rmc = right_mat.rmc;
+            row = right_mat.row;
+            col = right_mat.col;
+            memcpy(aloc_array, right_mat.aloc_array, sizeof(MT) * right_mat.rmc);
+        }
+    }
+
+    template <typename MT>
     Matrix <MT>::~Matrix ()
     {
         # ifdef DEBUG
@@ -107,7 +136,7 @@ namespace MatrixSpace
         // 检查自赋值
         if (this != &right_mat) {
             // 检查aloc_array问题
-            if (aloc_array != nullptr && rmc != right_mat.rmc) {
+            if (aloc_array != nullptr || rmc != right_mat.rmc) {
                 # ifdef DEBUG
                 std::cout << reinterpret_cast<unsigned long long>(aloc_array) << " freed" << std::endl;
                 globtest--;

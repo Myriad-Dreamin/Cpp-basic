@@ -1,5 +1,5 @@
 
-// # define DEBUG
+# define DEBUG
 
 #include <iostream>
 #include <cmath>
@@ -57,7 +57,7 @@ public:
 
     /*
      * 默认构造函数
-     * 
+     *
      * 默认构造为(0, 0)
      */
     Point ()
@@ -73,7 +73,7 @@ public:
     /*
      * 拷贝构造函数
      * @right_Point: 传入拷贝对象
-     */    
+     */
     Point (Point const &right_Point)
     {
         lfx = right_Point.lfx;
@@ -87,7 +87,7 @@ public:
     /*
      * 拷贝构造函数
      * @right_Point: 传入拷贝对象的地址
-     */    
+     */
     Point (Point const *right_Point)
     {
         lfx = right_Point->lfx;
@@ -115,7 +115,7 @@ public:
 
     /*
      * 析构函数
-     * 
+     *
      * 什么都不做
      */
     ~Point () {
@@ -128,7 +128,7 @@ public:
     /*
      * 距离函数
      * @right_pt: 传入一个右点
-     * 
+     *
      * 返回与右点的距离
      */
     inline double dist (Point const &right_pt=Point()) const
@@ -143,7 +143,7 @@ public:
      * 距离函数(双参数友元化)
      * @left_pt: 传入一个左点
      * @right_pt: 传入一个右点
-     * 
+     *
      * 返回左点与右点的距离
      */
     friend double dist (Point const &left_pt, Point const &right_pt);
