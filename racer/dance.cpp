@@ -1,117 +1,204 @@
 #include <iostream>
-
-#include <algorithm>
+#include <bitset>
 #include <vector>
+#include <utility>
+#include <cstring>
+#include <queue>
+#include <stdexcept>
 
-# define bit_arr(_arr, _idx) (((_arr) >> ((_idx) << 2)) & 0xf)
-# define set_arr(_arr, _idx, _x) (((_arr) & (~(0xf << ((_idx) << 2)))) | ((_x) << ((_idx) << 2)))
-# define swap_bit_arr(_arr, _hi, _lo) (\
-	(\
-		(_arr) &\
-		(~(\
-			(0xf << ((_hi) << 2)) |\
-			(0xf << ((_lo) << 2))\
-		))\
-	) |\
-	(\
-		(\
-			((((_arr) >> ((_lo) << 2)) & 0xf) << ((_hi) << 2)) |\
-			((((_arr) >> ((_hi) << 2)) & 0xf) << ((_lo) << 2))\
-		)\
-	)\
-)
+typedef std::pair<int, int> racer;
+typedef std::vector<racer> scenarios;
+typedef scenarios *scenarios_pt;
 
-const int MAX_SIZE = 32;
-const unsigned long long PERM_LONG = 0x0123456789abcdefLL;
-int sche[MAX_SIZE+2][MAX_SIZE+2];
-unsigned int bit_mask_check[1<<(MAX_SIZE>>1)];
-std::vector<unsigned int> bit_mask[(MAX_SIZE>>1)+2];
-
-std::string convert_binary (unsigned int x, int bit_count)
+template<int N>
+class ScheduleGenerator
 {
-	if (bit_count == 0) {
-		return std::string("");
-	}
-	std::string b(std::move(convert_binary(x >> 1, bit_count - 1)));
-	b.push_back((x & 1) ? '1' : '0');
-	return b;
-}
-std::vector<int> convert_permutation (unsigned long long x, int bit_count)
+public:
+
+    enum search_result: bool {success=true, failed=false};
+
+protected:
+    bool prepared;
+    std::vector<scenarios> gen_nodes;
+    std::vector<scenarios_pt> gen[N + 2];
+    std::bitset<N + 2> compared[N + 2];
+    scenarios_pt sche[N + 2];
+
+    std::priority_queue<int, std::vector<int>, std::greater<int> > unselected;
+    std::bitset<N + 2> not_vis;
+
+    void generate()
+    {
+        static scenarios srs;
+        if (!unselected.size()) {
+            gen_nodes.push_back(srs);
+            return ;
+        }
+        int cur = -1, i;
+        while (unselected.size()) {
+            i = unselected.top(); unselected.pop();
+            if (not_vis[i]) {
+                cur = i;
+                break;
+            }
+        }
+        if (cur == -1) {
+            gen_nodes.push_back(srs);
+            return ;
+        }
+        not_vis.reset(cur);
+        for (i = cur + 1; i < N; i++) {
+            if (not_vis[i]) {
+                not_vis.reset(i);
+                srs.push_back(std::move(std::make_pair(cur, i)));
+                generate();
+                not_vis.set(i);
+                srs.pop_back();
+                unselected.push(i);
+            }
+        }
+        not_vis.set(cur);
+        unselected.push(cur);
+    }
+
+    inline bool check (scenarios_pt scs_pt)
+    {
+        auto &scs = *scs_pt;
+        for (auto pairs: scs) {
+            if(compared[pairs.first][pairs.second])return false;
+        }
+        return true;
+    }
+
+    inline void sign (scenarios_pt scs_pt)
+    {
+        auto &scs = *scs_pt;
+        for (auto pairs: scs) {
+            compared[pairs.first][pairs.second] = true;
+        }
+    }
+
+    inline void unsign (scenarios_pt scs_pt)
+    {
+        auto &scs = *scs_pt;
+        for (auto pairs: scs) {
+            compared[pairs.first][pairs.second] = false;
+        }
+    }
+
+    search_result dfs(int rnd_cnt)
+    {
+        if (rnd_cnt == N) {
+            return search_result::success;
+        }
+        int nx_cnt = rnd_cnt + 1;
+        for (int i = 0; i < gen[rnd_cnt].size(); i++) {
+            sche[rnd_cnt] = gen[rnd_cnt][i];
+            sign(gen[rnd_cnt][i]);
+            for (int j = i + 1; j < gen[rnd_cnt].size(); j++) {
+                if (check(gen[rnd_cnt][j])) {
+                    gen[nx_cnt].push_back(gen[rnd_cnt][j]);
+                }
+            }
+            if (dfs(nx_cnt)) {
+                return search_result::success;
+            }
+            unsign(gen[rnd_cnt][i]);
+            gen[nx_cnt].clear();
+        }
+        return search_result::failed;
+    }
+public:
+    
+
+    ScheduleGenerator()
+    {
+        prepared = false;
+        
+        // generate inc_heap
+        std::vector<int> inc_arr;
+        inc_arr.reserve(N);
+        for (int i = 0; i < N; i++){
+            inc_arr.push_back(i);
+        }
+        unselected = std::move(
+            decltype(unselected)(inc_arr.begin(), inc_arr.end())
+        );
+
+        inc_arr.clear();
+        
+        // all node is not visited
+        not_vis.set();
+        generate();
+        gen[0].reserve(gen_nodes.size());
+        for (int i = 0; i < gen_nodes.size(); i++) {
+            gen[0].push_back(&gen_nodes[i]);
+        }
+        // for (auto scs: gen_nodes) {
+        //     for(auto pairs: scs) {
+        //         std::cout << "(" << pairs.first << ", " << pairs.second << ") ";
+        //     }
+        //     std::cout << std::endl;
+        // }
+    }
+
+    scenarios_pt *run()
+    {
+        if (prepared) {
+            return sche;
+        }
+        dfs(0);
+        prepared = true;
+        return sche;
+    }
+};
+
+void schedule_print(int **sche, int n)
 {
-	if (bit_count == 0) {
-		return std::vector<int>();
-	}
-	std::vector<int> p(std::move(convert_permutation(x >> 4, bit_count - 1)));
-	p.push_back(x & 0xf);
-	return p;
-}
-unsigned long long next_permutation (unsigned long long &x, int per_len)
-{
-	int hi = 1,lo = 0;
-	for (; hi < per_len; hi++) {
-		if(bit_arr(x, hi) < bit_arr(x, hi - 1))break;
-	}
-	if (hi == per_len) return x=-1;
-	for (int idx = 0; idx < hi; idx++) {
-		if(bit_arr(x, idx) < bit_arr(x, lo)) {
-			lo = idx;
-		}
-	}
-	printf("%d %d\n", hi, lo);
-	x = swap_bit_arr(x, hi, lo);
-	for (int idx = (hi >> 1) - 1; ~idx; idx--) {
-		x = swap_bit_arr(x, idx, hi - 1 - idx);
-	}
-	return x;
-}
-void search_init (std::vector<unsigned int> bit_mask[])
-{
-	int binary_max = 1<<(MAX_SIZE>>1);
-	for (int i = 0; i < binary_max; i++) {
-		bit_mask_check[i] = bit_mask_check[i >> 1] + (i & 1);
-		bit_mask[bit_mask_check[i]].emplace_back(i);
-	}
-
-	#ifdef DEBUG
-	for(auto s: bit_mask[2]){
-		cout << convert_binary(s, MAX_SIZE) << endl;
-	}
-	#endif
-
-	return ;
+    printf("id      |");
+    for (int i = 0; i < n; i++) {
+        if (i) {
+            printf("day %4d|", i);
+        }
+        for (int j = 0; j < n; j++) {
+            printf("%4d ", sche[i][j]);
+        }
+        puts("");
+        if (!i) {
+            printf("---------");
+            for (int j = 0; j < n; j++) {
+                printf("-----");
+            }
+            puts("");
+        }
+    }
 }
 
-void LCS(){
-	static int dp[40][40],n=30,m=30;
-	const char s[]="123", t[]="13";
-	for(int i=1;i<=n;i++) {
-		for(int j=1;j<=m;j++) {
-			if(s[i] == t[j]){
-				dp[i][j] = dp[i-1][j-1]+1;
-			}else {
-				dp[i][j] = std::max(dp[i-1][j], dp[i][j-1]);
-			}
-		}
-	}
-}
-
-void search(int m){
-	// max is 16
-	unsigned long long perm = PERM_LONG >> (64-(m<<1));
-	do {
-		auto vecp = convert_permutation(perm, m>>1);
-		for (auto s: vecp) {
-			std::cout << s << " ";
-		}
-		std::cout << std::endl;
-	}while(~next_permutation(perm, m>>1));
-	return ;
-}
 int main()
 {
-	using std::cout;
-	using std::endl;
-	search_init(bit_mask);
-	search(8);
-	return 0;
+    const int n = 4;
+    ScheduleGenerator<n> scheduler;
+    auto sche_res = scheduler.run();
+    
+    int **sche = new int*[n];
+    for (int i = 0; i < n; i++) {
+        sche[i] = new int[n];
+        sche[0][i] = i;
+    }
+
+    for (int i = 1; i < n; i++) {
+        auto &scs = *sche_res[i - 1];
+        for (auto pairs: scs) {
+            sche[i][pairs.first] = pairs.second;
+            sche[i][pairs.second] = pairs.first;
+        }
+    }
+
+    schedule_print(sche, n);
+
+    for (int i = 0; i < n; i++) {
+        delete[] sche[i];
+    }
+    delete[] sche;
+    return 0;
 }
