@@ -1,4 +1,6 @@
 #include <cstdio>
+#include <ctime>
+
 void schedule(int **sche, int n)
 {
     int subn = n - 1, subsubn = n - 2;
@@ -35,25 +37,27 @@ int main()
     for (int i = 0; i < n; i++) {
         sche[i] = new int[n];
     }
+    auto beg = clock();
     schedule(sche, n);
     // schedule2(sche, n);
-    printf("id      |");
-    for (int i = 0; i < n; i++) {
-        if (i) {
-            printf("day %4d|", i);
-        }
-        for (int j = 0; j < n; j++) {
-            printf("%4d ", sche[i][j]);
-        }
-        puts("");
-        if (!i) {
-            printf("---------");
-            for (int j = 0; j < n; j++) {
-                printf("-----");
-            }
-            puts("");
-        }
-    }
+    printf("%ldms", clock() - beg);
+    // printf("id      |");
+    // for (int i = 0; i < n; i++) {
+    //     if (i) {
+    //         printf("day %4d|", i);
+    //     }
+    //     for (int j = 0; j < n; j++) {
+    //         printf("%4d ", sche[i][j]);
+    //     }
+    //     puts("");
+    //     if (!i) {
+    //         printf("---------");
+    //         for (int j = 0; j < n; j++) {
+    //             printf("-----");
+    //         }
+    //         puts("");
+    //     }
+    // }
     for (int i = 0; i < n; i++) {
         delete[] sche[i];
     }

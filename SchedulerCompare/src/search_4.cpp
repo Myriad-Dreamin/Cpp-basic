@@ -1,27 +1,42 @@
+
 #include <iostream>
+#include <cstring>
+#include <iomanip>
+#include <ctime>
+
+#include <queue>
 #include <bitset>
 #include <vector>
 #include <utility>
-#include <cstring>
-#include <queue>
 #include <stdexcept>
 
-typedef std::pair<int, int> racer;
-typedef std::vector<racer> scenarios;
+
+/* 定义一场比赛为两个编号的pair */
+typedef std::pair<int, int> round;
+
+/* 定义一种可能的情况为round的数组 */
+typedef std::vector<round> scenarios;
 typedef scenarios *scenarios_pt;
 
 template<int N>
 class ScheduleGenerator
 {
 protected:
-    int cur_sel = 0, Nsub1 = N - 1;
+    /* 当前选到了第cur_sel个情况 */
+    int cur_sel = 0, Nsub2 = N - 2;
+
+    /* compared[x][y]表示x与y是否已较量过 */
     std::bitset<N + 2> compared[N + 2];
+    
+    /* 答案数组 */
     scenarios sche[N + 2];
 
+    /* 用于生成, 当前还有哪些人没选 */
     std::priority_queue<int, std::vector<int>, std::greater<int> > unselected;
+    /* 用于生成, 当前还有哪些人没选 */
     std::bitset<N + 2> not_vis;
 
-
+    /* 检测 */
     inline bool check (scenarios &scs)
     {
         for (auto pairs: scs) {
@@ -32,6 +47,7 @@ protected:
         return true;
     }
 
+    /* 标记 */
     inline void sign (scenarios &scs)
     {
         for (auto pairs: scs) {
@@ -39,10 +55,13 @@ protected:
         }
     }
 
+    /* 生成 */
     void generate ()
     {
+        /* 用于生成, 可回溯的情况数组 */
         static scenarios srs;
-        if(cur_sel == Nsub1) return ;
+
+        if(cur_sel == Nsub2) return ;
         if (!unselected.size()) {
             if(check(srs)){
                 sign(srs);
@@ -50,6 +69,8 @@ protected:
             }
             return ;
         }
+
+        /* 从unseleted中取出一个未选择的编号 */
         int cur = -1, i;
         while (unselected.size()) {
             i = unselected.top(); unselected.pop();
@@ -65,26 +86,33 @@ protected:
             }
             return ;
         }
+        
+        /* 回溯 */
+        // unselected在之前已经pop过
         not_vis.reset(cur);
         for (i = cur + 1; i < N; i++) {
             if (not_vis[i]) {
+
                 not_vis.reset(i);
                 srs.push_back(std::move(std::make_pair(cur, i)));
+                
                 generate();
-                if(cur_sel == Nsub1) return ;
-                not_vis.set(i);
+                if(cur_sel == Nsub2) return ;
+
+                // 此时i一定不在unseleted中
                 srs.pop_back();
                 unselected.push(i);
+                not_vis.set(i);
             }
         }
         not_vis.set(cur);
+        // 此时cur一定不在unseleted中
         unselected.push(cur);
     }
 
 public:
     ScheduleGenerator ()
     {
-
         // generate inc_heap
         std::vector<int> inc_arr;
         inc_arr.reserve(N);
@@ -99,6 +127,18 @@ public:
         // all node is not visited
         not_vis.set();
         generate();
+
+        // 根据前N-2天生成第N-1天
+        scenarios scs;
+        for (int i = 0; i < N; i++) {
+            for (int j = i + 1; j < N; j++) {
+                if(!compared[i][j]) {
+                    compared[i][j] = true;
+                    scs.push_back(std::move(std::make_pair(i, j)));
+                }
+            }
+        }
+        sche[N - 2] = std::move(scs);
     }
 
     scenarios_pt run()
@@ -107,32 +147,40 @@ public:
     }
 };
 
-void schedule_print(int **sche, int n)
+void schedule_print (int **sche, int n)
 {
-    printf("id      |");
+    using std::cout;
+    using std::endl;
+    cout << "id      |";
     for (int i = 0; i < n; i++) {
         if (i) {
-            printf("day %4d|", i);
+            cout << "day " << std::setw(4) << i << "|";
         }
         for (int j = 0; j < n; j++) {
-            printf("%4d ", sche[i][j]);
+            cout << std::setw(4) << sche[i][j] << " ";
         }
-        puts("");
+        cout << endl;
         if (!i) {
-            printf("---------");
+            cout << "---------";
             for (int j = 0; j < n; j++) {
-                printf("-----");
+                cout << "-----";
             }
-            puts("");
+            cout << endl;
         }
     }
 }
 
-int main()
+int main ()
 {
-    const int n = 16;
+    std::ios::sync_with_stdio(false);
+    
+    const int n = 20;
+
+    auto beg = clock();
     ScheduleGenerator<n> scheduler;
     auto sche_res = scheduler.run();
+    std::cout << clock() - beg << "ms" << std::endl;
+    
     int **sche = new int*[n];
     for (int i = 0; i < n; i++) {
         sche[i] = new int[n];
@@ -153,5 +201,6 @@ int main()
         delete[] sche[i];
     }
     delete[] sche;
+    
     return 0;
 }

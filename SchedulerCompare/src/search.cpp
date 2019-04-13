@@ -1,13 +1,20 @@
+
 #include <iostream>
+#include <cstring>
+#include <iomanip>
+
+#include <queue>
 #include <bitset>
 #include <vector>
 #include <utility>
-#include <cstring>
-#include <queue>
 #include <stdexcept>
 
-typedef std::pair<int, int> racer;
-typedef std::vector<racer> scenarios;
+
+/* 定义一场比赛为两个编号的pair */
+typedef std::pair<int, int> round;
+
+/* 定义一种可能的情况为round的数组 */
+typedef std::vector<round> scenarios;
 typedef scenarios *scenarios_pt;
 
 template<int N>
@@ -19,22 +26,34 @@ public:
 
 protected:
     bool prepared;
+    /* 所有可能的情况 */
     std::vector<scenarios> gen_nodes;
+    
+    /* 分为N阶段的情况指针数组 */
     std::vector<scenarios_pt> gen[N + 2];
+    
+    /* compared[x][y]表示x与y是否已较量过 */
     std::bitset<N + 2> compared[N + 2];
+    /* 答案数组 */
     scenarios_pt sche[N + 2];
 
+    /* 用于生成, 当前还有哪些人没选 */
     std::priority_queue<int, std::vector<int>, std::greater<int> > unselected;
+    /* 用于生成, 当前还有哪些人没选 */
     std::bitset<N + 2> not_vis;
 
-    void generate()
+    /* 生成 */
+    void generate ()
     {
+        /* 用于生成, 可回溯的情况数组 */
         static scenarios srs;
-        std::cout << unselected.size() << std::endl;
+        
         if (!unselected.size()) {
             gen_nodes.push_back(srs);
             return ;
         }
+        
+        /* 从unseleted中取出一个未选择的编号 */
         int cur = -1, i;
         while (unselected.size()) {
             i = unselected.top(); unselected.pop();
@@ -47,21 +66,31 @@ protected:
             gen_nodes.push_back(srs);
             return ;
         }
+        
+        /* 回溯 */
+        // unselected在之前已经pop过
         not_vis.reset(cur);
         for (i = cur + 1; i < N; i++) {
             if (not_vis[i]) {
-                not_vis.reset(i);
+
                 srs.push_back(std::move(std::make_pair(cur, i)));
+                not_vis.reset(i);
+                
                 generate();
+                
+                // 此时i一定不在unseleted中
+                unselected.push(i);
                 not_vis.set(i);
                 srs.pop_back();
-                unselected.push(i);
+                
             }
         }
         not_vis.set(cur);
+        // 此时cur一定不在unseleted中
         unselected.push(cur);
     }
 
+    /* 检测 */
     inline bool check (scenarios_pt scs_pt)
     {
         auto &scs = *scs_pt;
@@ -73,6 +102,7 @@ protected:
         return true;
     }
 
+    /* 标记 */
     inline void sign (scenarios_pt scs_pt)
     {
         auto &scs = *scs_pt;
@@ -81,6 +111,7 @@ protected:
         }
     }
 
+    /* 取消标记 */
     inline void unsign (scenarios_pt scs_pt)
     {
         auto &scs = *scs_pt;
@@ -89,68 +120,65 @@ protected:
         }
     }
 
-    search_result dfs(int rnd_cnt)
+    /* 深度优先搜索 */
+    search_result dfs (int rnd_cnt)
     {
     	static int Nsub1 = N - 1;
+
         if (rnd_cnt == Nsub1) {
             return search_result::success;
         }
+
         int nx_cnt = rnd_cnt + 1;
         for (int i = 0; i < gen[rnd_cnt].size(); i++) {
             sche[rnd_cnt] = gen[rnd_cnt][i];
+            
             sign(gen[rnd_cnt][i]);
-            std::cout << "gen" << "("<< rnd_cnt <<")" << std::endl;
-            for (auto pairs: *gen[rnd_cnt][i]) {
-                std::cout << "(" << pairs.first << ", " << pairs.second << ") ";
-            }
-            std::cout << std::endl;
             for (int j = i + 1; j < gen[rnd_cnt].size(); j++) {
                 if (check(gen[rnd_cnt][j])) {
                     gen[nx_cnt].push_back(gen[rnd_cnt][j]);
                 }
             }
+
             if (dfs(nx_cnt) == search_result::success) {
                 return search_result::success;
             }
-            unsign(gen[rnd_cnt][i]);
+
             gen[nx_cnt].clear();
+            unsign(gen[rnd_cnt][i]);
         }
+        
         return search_result::failed;
     }
-public:
-    
 
-    ScheduleGenerator()
+public:
+    ScheduleGenerator ()
     {
         prepared = false;
 
         // generate inc_heap
         std::vector<int> inc_arr;
         inc_arr.reserve(N);
-        for (int i = 0; i < N; i++){
+        for (int i = 0; i < N; i++) {
             inc_arr.push_back(i);
         }
         unselected = std::move(
             decltype(unselected)(inc_arr.begin(), inc_arr.end())
         );
-
         inc_arr.clear();
+
         // all node is not visited
         not_vis.set();
+
         generate();
+
         gen[0].reserve(gen_nodes.size());
         for (int i = 0; i < gen_nodes.size(); i++) {
             gen[0].push_back(&gen_nodes[i]);
         }
-        // for (auto scs: gen_nodes) {
-        //     for(auto pairs: scs) {
-        //         std::cout << "(" << pairs.first << ", " << pairs.second << ") ";
-        //     }
-        //     std::cout << std::endl;
-        // }
     }
 
-    scenarios_pt *run()
+    scenarios_pt *run ()
     {
         if (prepared) {
             return sche;
@@ -161,30 +189,35 @@ public:
     }
 };
 
-void schedule_print(int **sche, int n)
+void schedule_print (int **sche, int n)
 {
-    printf("id      |");
+    using std::cout;
+    using std::endl;
+    cout << "id      |";
     for (int i = 0; i < n; i++) {
         if (i) {
-            printf("day %4d|", i);
+            cout << "day " << std::setw(4) << i << "|";
         }
         for (int j = 0; j < n; j++) {
-            printf("%4d ", sche[i][j]);
+            cout << std::setw(4) << sche[i][j] << " ";
         }
-        puts("");
+        cout << endl;
         if (!i) {
-            printf("---------");
+            cout << "---------";
             for (int j = 0; j < n; j++) {
-                printf("-----");
+                cout << "-----";
             }
-            puts("");
+            cout << endl;
         }
     }
 }
 
-int main()
+int main ()
 {
-    const int n = 8;
+    std::ios::sync_with_stdio(false);
+    
+    const int n = 18;
+
     ScheduleGenerator<n> scheduler;
     auto sche_res = scheduler.run();
     
@@ -208,5 +241,6 @@ int main()
         delete[] sche[i];
     }
     delete[] sche;
+    
     return 0;
 }

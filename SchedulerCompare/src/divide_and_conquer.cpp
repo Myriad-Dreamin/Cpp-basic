@@ -1,8 +1,9 @@
-#include <cstdio>
+#include <iostream>
+#include <iomanip>
 #include <cstring>
+
 void schedule(int **sche, int n)
 {
-	printf("%d\n", n);
 	if (n == 2) {
 		sche[0][0] = 0; sche[0][1] = 1;
 		sche[1][0] = 1; sche[1][1] = 0;
@@ -38,40 +39,45 @@ void schedule(int **sche, int n)
 		}
 	}
 }
-void schedule_print(int **sche, int n)
+
+void schedule_print (int **sche, int n)
 {
-	printf("id      |");
-	for (int i = 0; i < n; i++) {
-	    if (i) {
-	        printf("day %4d|", i);
-	    }
-	    for (int j = 0; j < n; j++) {
-	        printf("%4d ", sche[i][j]);
-	    }
-	    puts("");
-	    if (!i) {
-	        printf("---------");
-	        for (int j = 0; j < n; j++) {
-	            printf("-----");
-	        }
-	        puts("");
-	    }
-	}
+    using std::cout;
+    using std::endl;
+    cout << "id      |";
+    for (int i = 0; i < n; i++) {
+        if (i) {
+            cout << "day " << std::setw(4) << i << "|";
+        }
+        for (int j = 0; j < n; j++) {
+            cout << std::setw(4) << sche[i][j] << " ";
+        }
+        cout << endl;
+        if (!i) {
+            cout << "---------";
+            for (int j = 0; j < n; j++) {
+                cout << "-----";
+            }
+            cout << endl;
+        }
+    }
 }
 int main()
 {
+	std::ios::sync_with_stdio(false);
     int n;
-    scanf("%d",&n);
+	std::cin >> n;
     if (n&1) {
         n++;
     }
     int **sche = new int*[n];
     for (int i = 0; i < n; i++) {
         sche[i] = new int[n];
-        memset(sche[i], 0 , n << 2);
     }
+    auto beg = clock();
     schedule(sche, n);
-    schedule_print(sche, n);
+    // schedule_print(sche, n);
+    std::cout << clock() - beg << "ms" << std::endl;
     for (int i = 0; i < n; i++) {
         delete[] sche[i];
     }

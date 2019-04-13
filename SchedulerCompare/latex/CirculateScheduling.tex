@@ -1,0 +1,393 @@
+%!TEX program = xelatex
+\documentclass[UTF8]{ctexart}
+
+% math bracket
+%  ()
+\newcommand{\brc}[1]{\left({{}#1}\right)}
+%  []
+\newcommand{\brm}[1]{\left[{{}#1}\right]}
+%  ||
+\newcommand{\brv}[1]{\left|{{}#1}\right|}
+%  {}
+\newcommand{\brf}[1]{\left\{{{}#1}\right\}}
+%  ||
+\newcommand{\brt}[1]{\left\Vert{{}#1}\right\Vert}
+%  <>
+\newcommand{\brg}[1]{\left<{{}#1}\right>}
+%  floor
+\newcommand{\floor}[1]{\lfloor{{}#1}\rfloor}
+%  ceil
+\newcommand{\ceil}[1]{\lceil{{}#1}\rceil}
+
+% font
+\newcommand{\fira}[1]{{\firacode {}#1}}
+
+% abbr command
+\newcommand{\ds}{\displaystyle}
+\newcommand{\pt}{\partial}
+\newcommand{\rint}[2]{\Big|^{{}#1}_{{}#2}}
+\newcommand{\leg}{\left\lgroup}
+\newcommand{\rig}{\right\rgroup}
+
+% math symbol
+\newcommand{\de}{\mathrm{d}}
+\newcommand{\im}{\mathrm{im}}
+\newcommand{\ord}{\mathrm{ord}}
+\newcommand{\cov}{\mathrm{Cov}}
+\newcommand{\lub}{\mathrm{LUB}}
+\newcommand{\glb}{\mathrm{GLB}}
+\newcommand{\var}{\mathrm{Var}}
+\newcommand{\aut}{\mathrm{Aut}}
+\newcommand{\sylow}{\mathrm{Sylow}}
+\newcommand{\xhi}{\mathcal{X}}
+\newcommand{\po}{\mathcal{P}}
+\newcommand{\bi}{\mathrm{b}}
+\newcommand{\rfl}{\mathcal{R}}
+
+% algorithmic symbol
+\newcommand{\gro}{\mathrm{O}}
+
+\newfontfamily\firacode{Fira Code}
+\newfontfamily\mincho{MS Mincho}
+
+% math
+\usepackage{ntheorem}
+\usepackage{ulem}
+
+\theoremseparator{ }
+\newtheorem{dft}{Definition}
+\newtheorem{tem}[dft]{Theorem}
+\newtheorem{lem}[dft]{Lemma}
+\newtheorem{epe}[dft]{Example}
+\newtheorem{cor}[dft]{Corollary}
+
+\usepackage{mathrsfs}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{cancel}
+%\usepackage{amsthm}
+
+% control
+\usepackage{ifthen}
+\usepackage{intcalc}
+
+% format
+\usepackage{indentfirst}
+\usepackage{enumerate}
+\usepackage{url}
+\usepackage{setspace}
+
+\usepackage{xcolor}
+
+\definecolor{ballblue}{rgb}{0.13, 0.67, 0.8}
+\definecolor{celestialblue}{rgb}{0.29, 0.59, 0.82}
+\definecolor{bananayellow}{rgb}{1.0, 0.88, 0.21}
+\definecolor{brilliantlavender}{rgb}{0.96, 0.73, 1.0}
+\definecolor{burgundy}{rgb}{0.5, 0.0, 0.13}
+\definecolor{cadmiumorange}{rgb}{0.93, 0.53, 0.18}
+\definecolor{aqua}{rgb}{0.0, 1.0, 1.0}
+\definecolor{auburn}{rgb}{0.43, 0.21, 0.1}
+\definecolor{brass}{rgb}{0.71, 0.65, 0.26}
+\definecolor{tangerine}{rgb}{0.95, 0.52, 0.0}
+\definecolor{portlandorange}{rgb}{1.0, 0.35, 0.21}
+\definecolor{mediumred-violet}{rgb}{0.73, 0.2, 0.52}
+
+% listing set
+\definecolor{func}{rgb}{0.29, 0.59, 0.82}
+\definecolor{ftype}{rgb}{0.95, 0.52, 0.0}
+\definecolor{cls}{rgb}{1.0, 0.35, 0.21}
+\definecolor{slf}{rgb}{0.73, 0.2, 0.52}
+\definecolor{backg}{HTML}{F7F7F7}
+\definecolor{str}{HTML}{228B22}
+% attestation
+\definecolor{atte}{RGB}{178,34,34}
+
+\usepackage{listings}
+
+\lstset{
+    backgroundcolor = \color{backg},
+    basicstyle = \small,%
+    escapeinside = ``,%
+    keywordstyle = \color{func},% \underbar,%
+    identifierstyle = {},%
+    commentstyle = \color{blue},%
+    stringstyle = \color{str}\ttfamily,%
+    %labelstyle = \tiny,%
+    extendedchars = false,%
+    linewidth = \textwidth,%
+}
+
+\usepackage{geometry}
+
+\geometry{
+    left=2.0cm,
+    right=2.0cm,
+    top=2.5cm,
+    bottom=2.5cm
+}
+
+\usepackage[
+    colorlinks,
+    linkcolor=blue,
+    anchorcolor=blue,
+    citecolor=blue
+]{hyperref}
+
+% table
+\usepackage{csvsimple}
+
+% graph
+\usepackage{tikz}
+\usepackage{pgfplots}
+\usetikzlibrary{
+    quotes,
+    angles,
+    matrix
+}
+
+
+\title{构造循环赛日程表}
+\author{MyriadDreamin\ 2017211279\ 2017211301}
+\date{}
+
+\begin{document}
+\setlength{\parindent}{2em}
+%\renewcommand{\baselinestretch}{1.5}
+\setlength{\baselineskip}{2.5em}
+\maketitle
+这些天一直都比较忙,但有空的时候总在琢磨循环赛日程表如何去安排.思考许久,未得要领.先给出循环赛日程表的定义吧:
+\begin{dft}[循环赛日程表]
+    定义选手个数为$n$,比赛天数为$n-1$天的日程表为循环赛日程表,当且仅当对于每个第$i(1\leqslant i\leqslant n)$个选手,在接下来的$n-1$天中,它与其他$n-1$名选手各比赛一次.
+\end{dft}
+\indent
+显然如果要构造循环赛日程表.每天必须选出一半的选手与剩下一半的选手比赛,所以选手的个数必须为偶数.如果选手为奇数,则只能增加一个虚拟的选手,如果有人抽到这名选手,则轮空.
+\subsection{约定}
+1.循环赛日程表的选手个数总是为n=2m个,标号为$1,2,\dots,n$.
+\subsection{循环赛日程表表示}
+循环赛总是由n阶方阵
+$T=\leg
+    \begin{matrix}
+        \text{racer} &
+        \text{day}_1 &
+        \dots&
+        \text{day}_{n-1}
+    \end{matrix}
+\rig^{T}$表示,每一个元素都是一个行向量.
+\begin{dft}[标准形式的循环赛日程表]第一行和第一列为自然序列的循环赛日程表,称为标准形式的循环赛日程表.如下:
+    $$
+        T=\leg
+        \begin{matrix}
+            \text{racer}\\
+            \text{day}_1\\
+            \vdots\\
+            \text{day}_{n-1}\\
+        \end{matrix}
+        \rig=
+        \leg
+        \begin{matrix}
+            1&2&\dots&n\\
+            2&a_{2,2}&\dots&a_{2,n}\\
+            \vdots&\vdots&\ddots&n\\
+            n&a_{n,2}&\dots&a_{n,n}\\
+        \end{matrix}
+        \rig
+    $$
+\end{dft}
+\begin{dft}{$J_n$矩阵}
+    $J_n$矩阵=$[1]_{n\times n}$
+\end{dft}
+\section{从对称性构造循环赛日程表}
+\subsection{正确性证明}
+\begin{tem}
+    \begin{enumerate}[(1)]
+    \item 设$T_{1,1}$是标准循环赛日程表$T$的余子式,那么,$T_{1,1}$中1恰出现了$n-1$次,其余标号恰出现了$n-2$次.
+    \item 若定义一次比赛中,两人$(i,j)$之间的距离为$i - j + kn, k\in Z$.则在$K_{n-1}$中,距离为$x, x \in Z$的边定有$n-1$条.
+    \end{enumerate}
+\end{tem}
+\begin{tem}[轮转法]
+    下面方法被称为轮转法:\\
+    将$1,2,3,\dots,n$逆时针排列,对于$d=1,2,...,n-1$的每一天:
+\begin{enumerate}[$(1)$]
+    \item 对于$d\pmod {n-1}+2,d+1\pmod {n-1}+2,...,d+n-1\pmod {n-1}+2$的每一个选手,选择距离为$2,4,...,2n-2$顺时针大于他的选手.
+    \item 对于$1$号选手,第$i$天选择$d+1$号选手.
+\end{enumerate}
+证明:设取得的边集为$S$,所有需要分配的边集为$E$.显然$S\subset E$.\\
+将对局按长度分类取模,长度为$1,2,\dots n - 2$各有$(n-1)$条.因为对于第$i$天,长度为$1,2,\dots n - 2$的边起点为$d\pmod {n-1}+2,d+1\pmod {n-1}+2,...,d+n-1\pmod {n-1}+2$, 除了在同一天的第$(d + i)\pmod {n-1} + 2$和$(d + n - 1 - i)\pmod {n-1} + 2$配对,配对后的边两两不同.而1号选手上被分配了$(n-1)$条边,这$n-1$条边与前面的每一条边都不同.\\
+所以总共分配了$\dfrac{(n -1)^2}{2} + (n - 1) = \dfrac{n(n -1)}{2}$条边.而$|E| = \dfrac{n(n -1)}{2}$,所以$S = E$.\\
+注意到第一段中有的性质,所以轮转法得到的方案是合法的.
+\end{tem}
+\subsection{复杂度分析}
+空间复杂度为$\Theta(1)$,时间复杂度为$T(n) = \Theta(n^2)$.
+\newpage
+\section{搜索优化构造循环赛日程表}
+\begin{dft}[scenarios]
+    有序整数对数组$S$为循环赛的一个scenarios,如果$S$的每对整数不重不漏地涵括了$n$个选手的对局.
+\end{dft}
+\subsection{思路}
+\subsubsection{分层搜索}
+\indent 下面是搜索$\mathrm{dfs}(i)$的思路:
+\begin{enumerate}[]
+    \item 假设已经生成了所有可能的方案$S_0$,初始化:$i \leftarrow 0, S_1,S_2,\dots , S_{n}\leftarrow \varnothing$, 解数组$D[n] = []$.
+    \item $\mathrm{dfs}(i)$:
+    \begin{enumerate}[1]
+        \item 设已选择i个scenarios,检查是否$i = n$,如果是,则结束算法.
+        \item 对于每个可选的scenarios\ $s \in S_i$,将所有与$s$不矛盾的scenarios推入$S_{i+1}$.
+        \begin{enumerate}[1]
+            \item 调用一次搜索$\mathrm{dfs}(i+1)$.
+        \item 如果搜索状态标记为已成功,则停止搜索,标记$D[i] = s$.
+        \item 如果搜索状态标记为不成功,则令$S_i \leftarrow S_i - \{s\}, S_{i+1}\leftarrow \varnothing$.
+        \end{enumerate}
+    \end{enumerate}
+\end{enumerate}
+
+
+下面是生成($\mathrm{generate}()$)的思路:
+\begin{enumerate}[]
+    \item 初始化可供选择的集合为$\Omega = \{1, 2, \dots, n\}$,scenarios\ $s=\varnothing$,可行方案$S_0=\varnothing$.
+    \item $\mathrm{generate}()$:
+    \begin{enumerate}[1]
+    \item 如果$\Omega = \varnothing$,则$S_0 \leftarrow S_0 + \{s\}$.
+    \item 选择$\mathsf{fir} = \min \Omega$, 对于每个$\mathsf{sec} \in \{\mathsf{sec}>\mathsf{fir}| \mathsf{sec} \Omega\}$.
+    \begin{enumerate}[1]
+        \item 令$\Omega \leftarrow \Omega - \{\mathsf{fir}, \mathsf{sec}\}, s \leftarrow s + \{(\mathsf{fir},\mathsf{sec})\}$,调用$\mathrm{generate}()$.
+        \item 令$\Omega \leftarrow \Omega + \{\mathsf{fir}, \mathsf{sec}\}$
+    \end{enumerate}
+\end{enumerate}
+\end{enumerate}
+\subsubsection{2.1.1的复杂度分析}
+设空间复杂度为$S(n)$.显然有
+$S(n) = \Theta(n-1)S(n-2)$.所以$S(n) = \Theta\brc{(n-1)!!}$
+根据观察,搜索算法能够一次遍历成功,从而时间复杂度为$T(n) = \gro((n-1)!!)$.很不巧,因为生成序列的选择问题$T(n)$也是$\Theta((n-1)!!)$的.关于单次递进遍历不会回溯的证明见Theorem\ 7.
+
+
+\subsubsection{改进搜索}
+先证明Theorem\ 7.
+\begin{tem}
+    如果$S$包含所有的规模为n的scenarios,那么2.1.1的搜索不会回溯.\\
+证明:首先循环赛日程表规划在n为偶数的情况下必然有解.取一解数组$D$,$D$的顺序可以调换,这不影响$D$仍为解,所以存在一种顺序$D[i_1],D[i_2],\dots, D[i_{n-1}]$使得其在$S$中依次出现.
+\end{tem}
+
+
+所以可以将$\mathrm{dfs}$嵌入$\mathrm{generate}$中.算法($\mathrm{dfs\_gen}()$)如下:
+\begin{enumerate}[]
+    \item 初始化可供选择的集合为$\Omega \leftarrow \{1, 2, \dots, n\}$,scenarios\ $s\leftarrow\varnothing, i\leftarrow 0$,解数组$D[n] \leftarrow []$.
+    \item generate():
+    \begin{enumerate}[1]
+        \item 如果$\Omega = \varnothing$,则判断$s$是否与$D$中已有方案矛盾.
+        \item 如果不矛盾:
+        \begin{enumerate}[1]
+            \item 令$D[i]\leftarrow s, i\leftarrow i + 1$.
+            \item 如果$i = n$,结束算法. 
+        \end{enumerate}
+        \item 选择$\mathsf{fir} = \min \Omega$, 对于每个$\mathsf{sec} \in \{\mathsf{sec}>\mathsf{fir}| \mathsf{sec} \Omega\}$:
+        \begin{enumerate}[1]
+            \item 令$\Omega \leftarrow \Omega - \{\mathsf{fir}, \mathsf{sec}\}, s \leftarrow s + \{(\mathsf{fir},\mathsf{sec})\}$,调用$\mathrm{generate}()$.
+            \item 令$\Omega \leftarrow \Omega + \{\mathsf{fir}, \mathsf{sec}\}$
+        \end{enumerate}
+    \end{enumerate}
+\end{enumerate}
+\subsubsection{2.1.3的复杂度分析}
+复杂度不会变化,时空复杂度均为$\gro(n!!)$.
+\newpage
+\section{分治法构造循环赛日程表}
+\subsection{实现}
+考虑分治算法($\mathrm{div\_con}(n)$).
+\begin{enumerate}[]
+    \item $\mathrm{div\_con}(n)\text{ return: matrix }T_{n\times n}\ or\ T_{(n+1)\times (n+1)}$:
+    \begin{enumerate}[1]
+        \item 如果 $n = 2$:
+        \begin{enumerate}[1]
+            \item 返回$T \leftarrow\begin{pmatrix}
+                1 & 0\\
+                0 & 1
+            \end{pmatrix}$.
+        \end{enumerate}
+        \item 如果 $n$是奇数:
+        \begin{enumerate}[1]
+            \item 返回 $\mathrm{div\_con}(n + 1)$.
+        \end{enumerate}
+        \item 如果 $n$是偶数:
+        \begin{enumerate}[1]
+            \item 令$T_s \leftarrow \mathrm{div\_con}(\dfrac{n}{2})$
+            \item 如果 $\dfrac{n}{2}$是偶数:
+            \begin{enumerate}[1]
+                \item 返回 $T  \leftarrow\begin{pmatrix}
+                    T_s & T_s + \dfrac{n}{2}J\\
+                    T_s + \dfrac{n}{2}J & T_s
+                \end{pmatrix}$.
+            \end{enumerate}
+            \item 如果 $\dfrac{n}{2}$是奇数:
+            \begin{enumerate}[1]
+                \item 令 $T_s\leftarrow \begin{pmatrix}
+                    row _1 T_s\\
+                    row _2 T_s\\
+                    \vdots\\
+                    row _{\frac{n}{2}} T_s
+                \end{pmatrix}$
+                \item 令 $U \leftarrow T_s, V\leftarrow T_s + \dfrac{n}{2}J$.
+                \item 对于 每一个 $i \in [1,\dfrac{n}{2}]$,
+                令 $U_{i,\frac{n}{2}-i + 2} \leftarrow i + \dfrac{n}{2}, V_{i,\frac{n}{2}-i + 2} \leftarrow i$.
+                \item 令 $P = \begin{pmatrix}
+                    1 & 2 & \dots &\dfrac{n}{2} - 1\\
+                    2 & 3 & \dots &\dfrac{n}{2}\\
+                    \vdots&\vdots&\ddots&\vdots\\
+                    \dfrac{n}{2} & \dfrac{n}{2} + 1 & \dots &\dfrac{n}{2} +\dfrac{n}{2} - 2
+                \end{pmatrix}\pmod {\dfrac{n}{2}} + (\dfrac{n}{2} + 1) J$
+                \item 令 $Q = \begin{pmatrix}
+                    0 & -1 & \dots & 2 - \dfrac{n}{2}\\
+                    -1 & -2 & \dots & -\dfrac{n}{2} + 1\\
+                    \vdots&\vdots&\ddots&\vdots\\
+                    1-\dfrac{n}{2} & -\dfrac{n}{2} & \dots &3-\dfrac{n}{2} -\dfrac{n}{2}
+                \end{pmatrix}\pmod {\dfrac{n}{2}} + J$
+                \item 返回 $T  \leftarrow\begin{pmatrix}
+                    U & P\\
+                    V & Q
+                \end{pmatrix}$.
+            \end{enumerate}
+        \end{enumerate}
+    \end{enumerate}
+\end{enumerate}
+因为是构造性算法,故不作证明.
+\subsection{算法复杂度}
+空间复杂度为$O(1)$(输入数组可重复利用空间),时间复杂度为$T(n) = T(n/2) + \gro(n^2)=O(n^2)$.
+\section{DanceLinkX算法构造循环赛日程表}
+构造矩阵$P_{\frac{n(n-1)^2}{2}\times 2n^2}$.\\
+\indent 对于每一个三元组$t=(x,y,z),0\leqslant x\leqslant n -2, 0\leqslant y < z \leqslant n - 1$构造矩阵第$f(x,y,z)=x\cdot n^2 + y \cdot n + z + 1$行,$x,y,z$分别代表行号,列号,值.
+\begin{enumerate}
+    \item 第 $y\cdot n + z + 1$列为1.
+    \item 第 $z\cdot n + y + 1$列为1.
+    \item 第 $n^2 +x\cdot n + z + 1$列为1.
+    \item 第 $n^2 +x\cdot n + y + 1$列为1.
+\end{enumerate}
+设$T'=\begin{pmatrix}
+    t_1 & t_2 & \dots & t_{k}
+\end{pmatrix}$是DanceLinkX算法求出的$P$的精准覆盖.
+\begin{tem}
+\begin{enumerate}[$(1)$]
+    \item f是双射.
+    \item $k=n(n-1)$.
+    \item $T=\brm{T_{f^{-1}(t_i).x,f^{-1}(t_i).y} = f^{-1}(t_i).z, T_{f^{-1}(t_i).x,f^{-1}(t_i).z} = f^{-1}(t_i).y}_{n\times n}$是循环赛日程表的第$2\sim n$行.
+\end{enumerate}
+\noindent 证明:不对$(1),(2)$作说明,现在来说明$(3)$.\\
+假设第$i(2\leqslant i \leqslant n)$行出现了重复的数字,设出现在第$y_1,y_2$列,值为$z$.那么根据构造第$n^2 + i\cdot n + z + 1$列中会同时有$f(x,y_1,z),f(x,y_2,z)$两行被选中,所以$P$不是精准覆盖.\\
+假设第$j(1\leqslant j\leqslant n)$列出现了重复的数字,设出现在第$x_1,x_2$行,值为$z$.那么根据构造第$y\cdot n + z + 1$列中会同时有$f(x_1,y,z),f(x_2,y,z)$两行被选中,所以$P$不是精准覆盖.\\
+假设第$(i,j)$格中填入了多余一个数字,设填入了$z_1,z_2$,根据构造第$n^2 + i\cdot n + y + 1$列中会同时有$f(i,j,z_1),f(i,j,z_2)$两行被选中,所以$P$不是精准覆盖.\\
+假设第$(i,j)$格中没有填入数字,那么显然第$n^2 + i \cdot n + j + 1$没有被覆盖(实际上存在1),所以$P$不是精准覆盖.\\
+\end{tem}
+附注:
+$$
+    \sum_{i=0}^{n-2}\sum_{j=0}^{n - 1}\sum_{k=j+1}^{n-1} 1 = \sum_{i=0}^{n-2}\sum_{j=0}^{ n -1} (n-1 - j) = \sum_{i = 0}^{n-2}\brm{n(n-1) - \frac{n(n-1)}{2}} = \frac{n(n-1)^2}{2}
+$$
+\subsection{复杂度分析}
+DanceLink仅仅是一种特殊的回溯结构,时间复杂度仍为$O(n!)$,空间复杂度为$O(n^5)$.
+\section{网络流模型构造循环赛日程表}
+\section{总结}
+本实验选取了几种比较经典的算法构造模型实现构造循环赛日程表.第一节给出了构造性的思路,为第二节证明做铺垫.第二节给出了朴素的搜索算法.第三节给出了分治算法,第四节给出了带数据结构优化的搜索算法.\\
+\indent 轮转法一分钟能够构造出$80000(\text{47.329s})$大小的日程表.\\
+\indent
+朴素搜索算法一分钟能够构造出$20$(第一次优化能构造18长度(6.315s),20长度爆栈,第二次优化44.463s,第三次优化42.154s)大小的日程表.\\
+\indent
+分治法一分钟能够构造出$65000(\text{34.040s})$大小的日程表.\\
+\indent
+DanceLinkX比较特别,首先它的空间复杂度比较高,其次在$2m$,m为奇数的情况下,最多构造$26$大小的日程表,剩下的情况,它能构造$92(\text{0.479ms,更高的会爆栈})$大小的日程表.所以最终认定它能构造$28$大小的日程表.\\
+\end{document}
